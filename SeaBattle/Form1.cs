@@ -8,7 +8,6 @@ namespace SeaBattle
 
         // для расстановки
         private int? selectedShipLength = null;
-        private bool isShipVertical = true; // по умолчанию — вертикально
 
         public Form1()
         {
@@ -61,7 +60,8 @@ namespace SeaBattle
             {
                 if (isPlayerField && selectedShipLength.HasValue)
                 {
-                    if (gameManager.PlayerBoard.PlaceShip(selectedShipLength.Value, r, c, isShipVertical))
+                    bool isVertical = radioVertical.Checked;
+                    if (gameManager.PlayerBoard.PlaceShip(selectedShipLength.Value, r, c, isVertical))
                     {
                         RenderPlayerBoard();
                         UpdateStatus();
@@ -76,7 +76,7 @@ namespace SeaBattle
             else if (gameManager.State == GameState.MyTurn)
             {
                 if (!isPlayerField)
-                {   
+                {
                     // стреляет по противнику
                     var (hit, result) = gameManager.PlayerShoot(r, c);
                     RenderEnemyBoard();
@@ -107,7 +107,7 @@ namespace SeaBattle
                     if (gameManager.State == GameState.GameOver)
                         return;
 
-   
+
                     if (gameManager.State == GameState.EnemyTurn)
                     {
                         ProcessEnemyTurn();
@@ -210,11 +210,6 @@ namespace SeaBattle
             selectedShipLength = 1;
         }
 
-        private void checkBoxVertical_CheckedChanged(object sender, EventArgs e)
-        {
-            isShipVertical = checkBoxVertical.Checked;
-        }
-
         private void UpdateShipButtons()
         {
             if (gameManager.State != GameState.Placement) return;
@@ -226,6 +221,18 @@ namespace SeaBattle
             btnShip3.Enabled = board.GetShipCount(3) < required[3];
             btnShip2.Enabled = board.GetShipCount(2) < required[2];
             btnShip1.Enabled = board.GetShipCount(1) < required[1];
+        }
+
+        private void buttonNewGame_Click(object sender, EventArgs e)
+        {
+            selectedShipLength = null;
+            radioVertical.Checked = true;
+
+            InitializeGame(); 
+
+            RenderPlayerBoard();
+            RenderEnemyBoard();
+            UpdateStatus();
         }
     }
 }

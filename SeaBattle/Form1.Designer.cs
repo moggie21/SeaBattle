@@ -44,13 +44,14 @@
             labelStatus = new Label();
             panel1 = new Panel();
             label5 = new Label();
-            checkBoxHorizontal = new CheckBox();
-            checkBoxVertical = new CheckBox();
             btnShip3 = new Button();
             btnShip2 = new Button();
             btnShip1 = new Button();
             btnShip4 = new Button();
             label4 = new Label();
+            buttonNewGame = new Button();
+            radioVertical = new RadioButton();
+            radioHorizontal = new RadioButton();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             panel1.SuspendLayout();
@@ -233,9 +234,9 @@
             // 
             // panel1
             // 
+            panel1.Controls.Add(radioHorizontal);
+            panel1.Controls.Add(radioVertical);
             panel1.Controls.Add(label5);
-            panel1.Controls.Add(checkBoxHorizontal);
-            panel1.Controls.Add(checkBoxVertical);
             panel1.Controls.Add(btnShip3);
             panel1.Controls.Add(btnShip2);
             panel1.Controls.Add(btnShip1);
@@ -255,29 +256,6 @@
             label5.Size = new Size(174, 20);
             label5.TabIndex = 7;
             label5.Text = "Как хотите разместить?";
-            // 
-            // checkBoxHorizontal
-            // 
-            checkBoxHorizontal.AutoSize = true;
-            checkBoxHorizontal.Location = new Point(19, 291);
-            checkBoxHorizontal.Name = "checkBoxHorizontal";
-            checkBoxHorizontal.Size = new Size(138, 24);
-            checkBoxHorizontal.TabIndex = 6;
-            checkBoxHorizontal.Text = "Горизонтально";
-            checkBoxHorizontal.UseVisualStyleBackColor = true;
-            // 
-            // checkBoxVertical
-            // 
-            checkBoxVertical.AutoSize = true;
-            checkBoxVertical.Checked = true;
-            checkBoxVertical.CheckState = CheckState.Checked;
-            checkBoxVertical.Location = new Point(19, 261);
-            checkBoxVertical.Name = "checkBoxVertical";
-            checkBoxVertical.Size = new Size(121, 24);
-            checkBoxVertical.TabIndex = 5;
-            checkBoxVertical.Text = "Вертикально";
-            checkBoxVertical.UseVisualStyleBackColor = true;
-            checkBoxVertical.CheckedChanged += checkBoxVertical_CheckedChanged;
             // 
             // btnShip3
             // 
@@ -329,11 +307,45 @@
             label4.TabIndex = 0;
             label4.Text = "Выберите корабль:";
             // 
+            // buttonNewGame
+            // 
+            buttonNewGame.Location = new Point(588, 587);
+            buttonNewGame.Name = "buttonNewGame";
+            buttonNewGame.Size = new Size(298, 46);
+            buttonNewGame.TabIndex = 8;
+            buttonNewGame.Text = "Играть снова?";
+            buttonNewGame.UseVisualStyleBackColor = true;
+            buttonNewGame.Click += buttonNewGame_Click;
+            // 
+            // radioVertical
+            // 
+            radioVertical.AutoSize = true;
+            radioVertical.Checked = true;
+            radioVertical.Location = new Point(19, 261);
+            radioVertical.Name = "radioVertical";
+            radioVertical.Size = new Size(120, 24);
+            radioVertical.TabIndex = 8;
+            radioVertical.TabStop = true;
+            radioVertical.Text = "Вертикально";
+            radioVertical.UseVisualStyleBackColor = true;
+            // 
+            // radioHorizontal
+            // 
+            radioHorizontal.AutoSize = true;
+            radioHorizontal.Location = new Point(19, 291);
+            radioHorizontal.Name = "radioHorizontal";
+            radioHorizontal.Size = new Size(137, 24);
+            radioHorizontal.TabIndex = 9;
+            radioHorizontal.TabStop = true;
+            radioHorizontal.Text = "Горизонтально";
+            radioHorizontal.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(982, 679);
+            Controls.Add(buttonNewGame);
             Controls.Add(panel1);
             Controls.Add(labelStatus);
             Controls.Add(label3);
@@ -378,7 +390,8 @@
         private Button btnShip4;
         private Label label4;
         private Label label5;
-        private CheckBox checkBoxHorizontal;
-        private CheckBox checkBoxVertical;
+        private Button buttonNewGame;
+        private RadioButton radioHorizontal;
+        private RadioButton radioVertical;
     }
 }
