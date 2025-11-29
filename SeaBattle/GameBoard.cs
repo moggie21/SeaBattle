@@ -12,6 +12,20 @@ namespace SeaBattle
         public List<Ship> Ships { get; private set; } = new List<Ship>();
         public bool PlacementComplete { get; private set; }
 
+        // подсчет кораблей
+        private Dictionary<int, int> shipCounts = new()
+        {
+            {4, 0}, // 4-палубных
+            {3, 0}, // 3-палубных
+            {2, 0}, // 2-палубных
+            {1, 0}  // 1-палубных
+        };
+
+        public int GetShipCount(int length)
+        {
+            return shipCounts.TryGetValue(length, out int count) ? count : 0;
+        }
+
         public GameBoard()
         {
             // изначально всё пусто
@@ -52,6 +66,11 @@ namespace SeaBattle
             if (!CanPlaceShip(length, startRow, startCol, isVertical))
                 return false;
 
+            if (shipCounts.TryGetValue(length, out int count) && count >= GameBoard.RequiredShips[length])
+            {
+                return false;
+            }
+
             var ship = new Ship(length, startRow, startCol, isVertical);
             var cells = ship.GetCells();
 
@@ -61,6 +80,8 @@ namespace SeaBattle
             }
 
             Ships.Add(ship);
+            shipCounts[length]++;
+
             return true;
         }
 
@@ -130,6 +151,7 @@ namespace SeaBattle
         {
             return Ships.All(s => s.IsSunk);
         }
+
 
         // получить требуемый набор кораблей
         public static Dictionary<int, int> RequiredShips => new()
