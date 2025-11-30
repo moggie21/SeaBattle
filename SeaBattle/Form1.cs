@@ -43,6 +43,12 @@ namespace SeaBattle
 
                     cell.Click += Cell_Click;
 
+                    if (isPlayer)
+                    {
+                        cell.MouseEnter += PlayerCell_MouseEnter;
+                        cell.MouseLeave += PlayerCell_MouseLeave;
+                    }
+
                     cells[r, c] = cell;
                     panel.Controls.Add(cell, c, r); // column = c, row = r
                 }
@@ -89,6 +95,55 @@ namespace SeaBattle
                     }
                 }
             }
+        }
+
+        private void PlayerCell_MouseEnter(object sender, EventArgs e)
+        {
+            if (gameManager.State != GameState.Placement || !selectedShipLength.HasValue)
+                return;
+
+            if (sender is not Panel panel || panel.Tag is not (int r, int c, bool isPlayer) || !isPlayer)
+                return;
+
+            bool isVertical = radioVertical.Checked;
+            int length = selectedShipLength.Value;
+
+            // какие клетки занял бы корабль
+            var previewCells = new List<(int, int)>();
+            if (isVertical)
+            {
+                for (int i = 0; i < length; i++)
+                    previewCells.Add((r + i, c));
+            }
+            else
+            {
+                for (int i = 0; i < length; i++)
+                    previewCells.Add((r, c + i));
+            }
+
+            // помещается ли корабль в границы
+            bool inBounds = previewCells.All(pos => pos.Item1 >= 0 && pos.Item1 < 10 && pos.Item2 >= 0 && pos.Item2 < 10);
+
+            // можно ли разместить 
+            bool canPlace = inBounds && gameManager.PlayerBoard.CanPlaceShip(length, r, c, isVertical);
+
+            // подсветка клетки
+            foreach (var (row, col) in previewCells)
+            {
+                if (row >= 0 && row < 10 && col >= 0 && col < 10)
+                {
+                    Color color = canPlace ? Color.LightGreen : Color.LightPink;
+                    playerCells[row, col].BackColor = color;
+                }
+            }
+        }
+
+        private void PlayerCell_MouseLeave(object sender, EventArgs e)
+        {
+            if (gameManager.State != GameState.Placement)
+                return;
+
+            RenderPlayerBoard();
         }
 
         private void ProcessEnemyTurn()
