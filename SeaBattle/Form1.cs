@@ -1,8 +1,11 @@
+using System.Windows.Forms;
+
 namespace SeaBattle
 {
     public partial class Form1 : Form
     {
         private GameManager gameManager;
+        private GameMode currentGameMode = GameMode.None;
         private Panel[,] playerCells = new Panel[10, 10];
         private Panel[,] enemyCells = new Panel[10, 10];
 
@@ -12,7 +15,33 @@ namespace SeaBattle
         public Form1()
         {
             InitializeComponent();
+            ShowMainMenu();
+        }
+
+        private void ShowMainMenu()
+        {
+            panelMainMenu.Visible = true;
+            panelGame.Visible = false;
+        }
+
+        private void ShowGamePanel()
+        {
+            panelGame.Visible = true;
+            panelMainMenu.Visible = false;
+        }
+
+        private void btnSolo_Click(object sender, EventArgs e)
+        {
+            currentGameMode = GameMode.Solo;
             InitializeGame();
+            ShowGamePanel();
+        }
+
+        private void btnMultiplayer_Click(object sender, EventArgs e)
+        {
+            currentGameMode = GameMode.Multiplayer;
+            InitializeGame();
+            ShowGamePanel();
         }
 
         private void InitializeGame()
@@ -27,6 +56,7 @@ namespace SeaBattle
 
         private void CreateGrid(TableLayoutPanel panel, Panel[,] cells, bool isPlayer)
         {
+            panel.SuspendLayout();
             panel.Controls.Clear();
 
             for (int r = 0; r < 10; r++)
@@ -53,6 +83,7 @@ namespace SeaBattle
                     panel.Controls.Add(cell, c, r); // column = c, row = r
                 }
             }
+            panel.ResumeLayout();
         }
 
         private void Cell_Click(object sender, EventArgs e)
@@ -228,23 +259,6 @@ namespace SeaBattle
             labelStatus.Text = status;
         }
 
-        private void buttonStartSolo_Click(object sender, EventArgs e)
-        {
-            if (gameManager.State == GameState.Placement)
-            {
-                if (gameManager.TryFinishPlacement())
-                {
-                    RenderPlayerBoard();
-                    RenderEnemyBoard();
-                    UpdateStatus();
-                }
-                else
-                {
-                    MessageBox.Show("Расставьте все корабли!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-            }
-        }
-
         private void btnShip4_Click(object sender, EventArgs e)
         {
             selectedShipLength = 4;
@@ -283,11 +297,34 @@ namespace SeaBattle
             selectedShipLength = null;
             radioVertical.Checked = true;
 
-            InitializeGame(); 
+            InitializeGame();
 
             RenderPlayerBoard();
             RenderEnemyBoard();
             UpdateStatus();
+        }
+
+        private void buttonBackToMenu_Click(object sender, EventArgs e)
+        {
+            ShowMainMenu();
+            gameManager = null;
+        }
+
+        private void buttonStartSolo_Click(object sender, EventArgs e)
+        {
+            if (gameManager.State == GameState.Placement)
+            {
+                if (gameManager.TryFinishPlacement())
+                {
+                    RenderPlayerBoard();
+                    RenderEnemyBoard();
+                    UpdateStatus();
+                }
+                else
+                {
+                    MessageBox.Show("Расставьте все корабли!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
         }
     }
 }

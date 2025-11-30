@@ -28,64 +28,32 @@
         /// </summary>
         private void InitializeComponent()
         {
-            playerPanel = new TableLayoutPanel();
             enemyPanel = new TableLayoutPanel();
-            groupBox1 = new GroupBox();
-            button2 = new Button();
-            button1 = new Button();
-            labelPort = new TextBox();
-            label1 = new Label();
-            textBoxIp = new TextBox();
-            labelIp = new Label();
-            groupBox2 = new GroupBox();
-            buttonStartSolo = new Button();
             label2 = new Label();
-            label3 = new Label();
-            labelStatus = new Label();
             panel1 = new Panel();
+            radioHorizontal = new RadioButton();
+            radioVertical = new RadioButton();
             label5 = new Label();
             btnShip3 = new Button();
             btnShip2 = new Button();
             btnShip1 = new Button();
             btnShip4 = new Button();
             label4 = new Label();
+            label3 = new Label();
+            playerPanel = new TableLayoutPanel();
             buttonNewGame = new Button();
-            radioVertical = new RadioButton();
-            radioHorizontal = new RadioButton();
-            groupBox1.SuspendLayout();
-            groupBox2.SuspendLayout();
+            labelStatus = new Label();
+            panelGame = new Panel();
+            buttonStartSolo = new Button();
+            buttonBackToMenu = new Button();
+            panelMainMenu = new Panel();
+            btnMultiplayer = new Button();
+            btnSolo = new Button();
+            label6 = new Label();
             panel1.SuspendLayout();
+            panelGame.SuspendLayout();
+            panelMainMenu.SuspendLayout();
             SuspendLayout();
-            // 
-            // playerPanel
-            // 
-            playerPanel.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
-            playerPanel.ColumnCount = 10;
-            playerPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
-            playerPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
-            playerPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
-            playerPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
-            playerPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
-            playerPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
-            playerPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
-            playerPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
-            playerPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
-            playerPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
-            playerPanel.Location = new Point(49, 107);
-            playerPanel.Name = "playerPanel";
-            playerPanel.RowCount = 10;
-            playerPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
-            playerPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
-            playerPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
-            playerPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
-            playerPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
-            playerPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
-            playerPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
-            playerPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
-            playerPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
-            playerPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
-            playerPanel.Size = new Size(300, 300);
-            playerPanel.TabIndex = 0;
             // 
             // enemyPanel
             // 
@@ -101,7 +69,7 @@
             enemyPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
             enemyPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
             enemyPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
-            enemyPanel.Location = new Point(637, 107);
+            enemyPanel.Location = new Point(652, 115);
             enemyPanel.Name = "enemyPanel";
             enemyPanel.RowCount = 10;
             enemyPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
@@ -117,120 +85,15 @@
             enemyPanel.Size = new Size(300, 300);
             enemyPanel.TabIndex = 1;
             // 
-            // groupBox1
-            // 
-            groupBox1.Controls.Add(button2);
-            groupBox1.Controls.Add(button1);
-            groupBox1.Controls.Add(labelPort);
-            groupBox1.Controls.Add(label1);
-            groupBox1.Controls.Add(textBoxIp);
-            groupBox1.Controls.Add(labelIp);
-            groupBox1.Location = new Point(49, 465);
-            groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(413, 191);
-            groupBox1.TabIndex = 2;
-            groupBox1.TabStop = false;
-            groupBox1.Text = "Cетевая игра";
-            // 
-            // button2
-            // 
-            button2.Location = new Point(176, 134);
-            button2.Name = "button2";
-            button2.Size = new Size(124, 34);
-            button2.TabIndex = 5;
-            button2.Text = "Подключиться";
-            button2.UseVisualStyleBackColor = true;
-            // 
-            // button1
-            // 
-            button1.Location = new Point(15, 134);
-            button1.Name = "button1";
-            button1.Size = new Size(124, 34);
-            button1.TabIndex = 4;
-            button1.Text = "Создать игру";
-            button1.UseVisualStyleBackColor = true;
-            // 
-            // labelPort
-            // 
-            labelPort.Location = new Point(91, 83);
-            labelPort.Name = "labelPort";
-            labelPort.Size = new Size(278, 27);
-            labelPort.TabIndex = 3;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(15, 86);
-            label1.Name = "label1";
-            label1.Size = new Size(47, 20);
-            label1.TabIndex = 2;
-            label1.Text = "Порт:";
-            // 
-            // textBoxIp
-            // 
-            textBoxIp.Location = new Point(91, 36);
-            textBoxIp.Name = "textBoxIp";
-            textBoxIp.Size = new Size(278, 27);
-            textBoxIp.TabIndex = 1;
-            // 
-            // labelIp
-            // 
-            labelIp.AutoSize = true;
-            labelIp.Location = new Point(15, 39);
-            labelIp.Name = "labelIp";
-            labelIp.Size = new Size(70, 20);
-            labelIp.TabIndex = 0;
-            labelIp.Text = "IP-адрес:";
-            // 
-            // groupBox2
-            // 
-            groupBox2.Controls.Add(buttonStartSolo);
-            groupBox2.Location = new Point(554, 465);
-            groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(383, 88);
-            groupBox2.TabIndex = 3;
-            groupBox2.TabStop = false;
-            groupBox2.Text = "Одиночная игра";
-            // 
-            // buttonStartSolo
-            // 
-            buttonStartSolo.Location = new Point(34, 35);
-            buttonStartSolo.Name = "buttonStartSolo";
-            buttonStartSolo.Size = new Size(298, 39);
-            buttonStartSolo.TabIndex = 0;
-            buttonStartSolo.Text = "Играть против бота";
-            buttonStartSolo.UseVisualStyleBackColor = true;
-            buttonStartSolo.Click += buttonStartSolo_Click;
-            // 
             // label2
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label2.Location = new Point(49, 75);
+            label2.Location = new Point(29, 83);
             label2.Name = "label2";
             label2.Size = new Size(84, 20);
             label2.TabIndex = 4;
             label2.Text = "Ваше поле";
-            // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label3.Location = new Point(637, 75);
-            label3.Name = "label3";
-            label3.Size = new Size(133, 20);
-            label3.TabIndex = 5;
-            label3.Text = "Поле противника";
-            // 
-            // labelStatus
-            // 
-            labelStatus.AutoSize = true;
-            labelStatus.Font = new Font("Bookman Old Style", 10.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            labelStatus.Location = new Point(49, 22);
-            labelStatus.Name = "labelStatus";
-            labelStatus.Size = new Size(244, 21);
-            labelStatus.TabIndex = 6;
-            labelStatus.Text = "Расстановка кораблей...";
             // 
             // panel1
             // 
@@ -242,10 +105,33 @@
             panel1.Controls.Add(btnShip1);
             panel1.Controls.Add(btnShip4);
             panel1.Controls.Add(label4);
-            panel1.Location = new Point(390, 75);
+            panel1.Location = new Point(387, 86);
             panel1.Name = "panel1";
             panel1.Size = new Size(205, 329);
             panel1.TabIndex = 7;
+            // 
+            // radioHorizontal
+            // 
+            radioHorizontal.AutoSize = true;
+            radioHorizontal.Location = new Point(19, 291);
+            radioHorizontal.Name = "radioHorizontal";
+            radioHorizontal.Size = new Size(137, 24);
+            radioHorizontal.TabIndex = 9;
+            radioHorizontal.TabStop = true;
+            radioHorizontal.Text = "Горизонтально";
+            radioHorizontal.UseVisualStyleBackColor = true;
+            // 
+            // radioVertical
+            // 
+            radioVertical.AutoSize = true;
+            radioVertical.Checked = true;
+            radioVertical.Location = new Point(19, 261);
+            radioVertical.Name = "radioVertical";
+            radioVertical.Size = new Size(120, 24);
+            radioVertical.TabIndex = 8;
+            radioVertical.TabStop = true;
+            radioVertical.Text = "Вертикально";
+            radioVertical.UseVisualStyleBackColor = true;
             // 
             // label5
             // 
@@ -259,7 +145,7 @@
             // 
             // btnShip3
             // 
-            btnShip3.Location = new Point(19, 86);
+            btnShip3.Location = new Point(28, 87);
             btnShip3.Name = "btnShip3";
             btnShip3.Size = new Size(145, 34);
             btnShip3.TabIndex = 4;
@@ -269,7 +155,7 @@
             // 
             // btnShip2
             // 
-            btnShip2.Location = new Point(19, 126);
+            btnShip2.Location = new Point(28, 127);
             btnShip2.Name = "btnShip2";
             btnShip2.Size = new Size(145, 34);
             btnShip2.TabIndex = 3;
@@ -279,7 +165,7 @@
             // 
             // btnShip1
             // 
-            btnShip1.Location = new Point(19, 166);
+            btnShip1.Location = new Point(28, 167);
             btnShip1.Name = "btnShip1";
             btnShip1.Size = new Size(145, 34);
             btnShip1.TabIndex = 2;
@@ -289,7 +175,7 @@
             // 
             // btnShip4
             // 
-            btnShip4.Location = new Point(19, 46);
+            btnShip4.Location = new Point(28, 47);
             btnShip4.Name = "btnShip4";
             btnShip4.Size = new Size(145, 34);
             btnShip4.TabIndex = 1;
@@ -307,91 +193,204 @@
             label4.TabIndex = 0;
             label4.Text = "Выберите корабль:";
             // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label3.Location = new Point(652, 83);
+            label3.Name = "label3";
+            label3.Size = new Size(133, 20);
+            label3.TabIndex = 5;
+            label3.Text = "Поле противника";
+            // 
+            // playerPanel
+            // 
+            playerPanel.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
+            playerPanel.ColumnCount = 10;
+            playerPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
+            playerPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
+            playerPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
+            playerPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
+            playerPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
+            playerPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
+            playerPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
+            playerPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
+            playerPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
+            playerPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
+            playerPanel.Location = new Point(29, 115);
+            playerPanel.Name = "playerPanel";
+            playerPanel.RowCount = 10;
+            playerPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
+            playerPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
+            playerPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
+            playerPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
+            playerPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
+            playerPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
+            playerPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
+            playerPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
+            playerPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
+            playerPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
+            playerPanel.Size = new Size(300, 300);
+            playerPanel.TabIndex = 0;
+            // 
             // buttonNewGame
             // 
-            buttonNewGame.Location = new Point(588, 587);
+            buttonNewGame.Location = new Point(333, 521);
             buttonNewGame.Name = "buttonNewGame";
-            buttonNewGame.Size = new Size(298, 46);
+            buttonNewGame.Size = new Size(316, 46);
             buttonNewGame.TabIndex = 8;
             buttonNewGame.Text = "Играть снова?";
             buttonNewGame.UseVisualStyleBackColor = true;
             buttonNewGame.Click += buttonNewGame_Click;
             // 
-            // radioVertical
+            // labelStatus
             // 
-            radioVertical.AutoSize = true;
-            radioVertical.Checked = true;
-            radioVertical.Location = new Point(19, 261);
-            radioVertical.Name = "radioVertical";
-            radioVertical.Size = new Size(120, 24);
-            radioVertical.TabIndex = 8;
-            radioVertical.TabStop = true;
-            radioVertical.Text = "Вертикально";
-            radioVertical.UseVisualStyleBackColor = true;
+            labelStatus.AutoSize = true;
+            labelStatus.Font = new Font("Bookman Old Style", 13.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            labelStatus.Location = new Point(29, 33);
+            labelStatus.Name = "labelStatus";
+            labelStatus.Size = new Size(313, 28);
+            labelStatus.TabIndex = 6;
+            labelStatus.Text = "Расстановка кораблей...";
             // 
-            // radioHorizontal
+            // panelGame
             // 
-            radioHorizontal.AutoSize = true;
-            radioHorizontal.Location = new Point(19, 291);
-            radioHorizontal.Name = "radioHorizontal";
-            radioHorizontal.Size = new Size(137, 24);
-            radioHorizontal.TabIndex = 9;
-            radioHorizontal.TabStop = true;
-            radioHorizontal.Text = "Горизонтально";
-            radioHorizontal.UseVisualStyleBackColor = true;
+            panelGame.BackColor = Color.White;
+            panelGame.Controls.Add(buttonStartSolo);
+            panelGame.Controls.Add(buttonBackToMenu);
+            panelGame.Controls.Add(labelStatus);
+            panelGame.Controls.Add(buttonNewGame);
+            panelGame.Controls.Add(playerPanel);
+            panelGame.Controls.Add(label3);
+            panelGame.Controls.Add(panel1);
+            panelGame.Controls.Add(label2);
+            panelGame.Controls.Add(enemyPanel);
+            panelGame.Dock = DockStyle.Fill;
+            panelGame.Location = new Point(0, 0);
+            panelGame.Name = "panelGame";
+            panelGame.Size = new Size(982, 679);
+            panelGame.TabIndex = 9;
+            panelGame.Visible = false;
+            // 
+            // buttonStartSolo
+            // 
+            buttonStartSolo.BackColor = Color.FromArgb(192, 192, 255);
+            buttonStartSolo.Cursor = Cursors.Hand;
+            buttonStartSolo.FlatStyle = FlatStyle.Flat;
+            buttonStartSolo.Location = new Point(333, 453);
+            buttonStartSolo.Name = "buttonStartSolo";
+            buttonStartSolo.Size = new Size(316, 46);
+            buttonStartSolo.TabIndex = 10;
+            buttonStartSolo.Text = "В бой";
+            buttonStartSolo.UseVisualStyleBackColor = false;
+            buttonStartSolo.Click += buttonStartSolo_Click;
+            // 
+            // buttonBackToMenu
+            // 
+            buttonBackToMenu.Location = new Point(333, 584);
+            buttonBackToMenu.Name = "buttonBackToMenu";
+            buttonBackToMenu.Size = new Size(316, 46);
+            buttonBackToMenu.TabIndex = 9;
+            buttonBackToMenu.Text = "← Назад в меню";
+            buttonBackToMenu.UseVisualStyleBackColor = true;
+            buttonBackToMenu.Click += buttonBackToMenu_Click;
+            // 
+            // panelMainMenu
+            // 
+            panelMainMenu.BackColor = Color.FromArgb(0, 0, 64);
+            panelMainMenu.Controls.Add(btnMultiplayer);
+            panelMainMenu.Controls.Add(btnSolo);
+            panelMainMenu.Controls.Add(label6);
+            panelMainMenu.Dock = DockStyle.Fill;
+            panelMainMenu.Location = new Point(0, 0);
+            panelMainMenu.Name = "panelMainMenu";
+            panelMainMenu.Size = new Size(982, 679);
+            panelMainMenu.TabIndex = 10;
+            // 
+            // btnMultiplayer
+            // 
+            btnMultiplayer.BackColor = Color.FromArgb(0, 0, 64);
+            btnMultiplayer.Cursor = Cursors.Hand;
+            btnMultiplayer.FlatStyle = FlatStyle.Flat;
+            btnMultiplayer.Font = new Font("Bookman Old Style", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnMultiplayer.ForeColor = Color.FromArgb(192, 192, 255);
+            btnMultiplayer.Location = new Point(264, 326);
+            btnMultiplayer.Name = "btnMultiplayer";
+            btnMultiplayer.Size = new Size(442, 65);
+            btnMultiplayer.TabIndex = 2;
+            btnMultiplayer.Text = "Мультиплеерная игра";
+            btnMultiplayer.UseVisualStyleBackColor = false;
+            btnMultiplayer.Click += btnMultiplayer_Click;
+            // 
+            // btnSolo
+            // 
+            btnSolo.BackColor = Color.FromArgb(0, 0, 64);
+            btnSolo.Cursor = Cursors.Hand;
+            btnSolo.FlatStyle = FlatStyle.Flat;
+            btnSolo.Font = new Font("Bookman Old Style", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnSolo.ForeColor = Color.FromArgb(192, 192, 255);
+            btnSolo.Location = new Point(264, 213);
+            btnSolo.Name = "btnSolo";
+            btnSolo.Size = new Size(442, 65);
+            btnSolo.TabIndex = 1;
+            btnSolo.Text = "Одиночная игра";
+            btnSolo.UseVisualStyleBackColor = false;
+            btnSolo.Click += btnSolo_Click;
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.Font = new Font("Bookman Old Style", 19.8000011F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label6.ForeColor = Color.FromArgb(192, 192, 255);
+            label6.Location = new Point(264, 103);
+            label6.Name = "label6";
+            label6.Size = new Size(442, 40);
+            label6.TabIndex = 0;
+            label6.Text = "Выберите режим игры";
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(982, 679);
-            Controls.Add(buttonNewGame);
-            Controls.Add(panel1);
-            Controls.Add(labelStatus);
-            Controls.Add(label3);
-            Controls.Add(label2);
-            Controls.Add(groupBox2);
-            Controls.Add(groupBox1);
-            Controls.Add(enemyPanel);
-            Controls.Add(playerPanel);
+            Controls.Add(panelMainMenu);
+            Controls.Add(panelGame);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             Name = "Form1";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Морской Бой";
-            groupBox1.ResumeLayout(false);
-            groupBox1.PerformLayout();
-            groupBox2.ResumeLayout(false);
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
+            panelGame.ResumeLayout(false);
+            panelGame.PerformLayout();
+            panelMainMenu.ResumeLayout(false);
+            panelMainMenu.PerformLayout();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
 
-        private TableLayoutPanel playerPanel;
         private TableLayoutPanel enemyPanel;
-        private GroupBox groupBox1;
-        private TextBox textBoxIp;
-        private Label labelIp;
-        private Button button1;
-        private TextBox labelPort;
-        private Label label1;
-        private Button button2;
-        private GroupBox groupBox2;
-        private Button buttonStartSolo;
         private Label label2;
-        private Label label3;
-        private Label labelStatus;
         private Panel panel1;
+        private RadioButton radioHorizontal;
+        private RadioButton radioVertical;
+        private Label label5;
         private Button btnShip3;
         private Button btnShip2;
         private Button btnShip1;
         private Button btnShip4;
         private Label label4;
-        private Label label5;
+        private Label label3;
+        private TableLayoutPanel playerPanel;
         private Button buttonNewGame;
-        private RadioButton radioHorizontal;
-        private RadioButton radioVertical;
+        private Label labelStatus;
+        private Panel panelGame;
+        private Panel panelMainMenu;
+        private Button btnMultiplayer;
+        private Button btnSolo;
+        private Label label6;
+        private Button buttonBackToMenu;
+        private Button buttonStartSolo;
     }
 }
