@@ -22,12 +22,21 @@ namespace SeaBattle
         {
             panelMainMenu.Visible = true;
             panelGame.Visible = false;
+            panelLobby.Visible = false;
         }
 
         private void ShowGamePanel()
         {
             panelGame.Visible = true;
             panelMainMenu.Visible = false;
+            panelLobby.Visible = false;
+        }
+
+        private void ShowLobbyPanel()
+        {
+            panelLobby.Visible = true;
+            panelMainMenu.Visible = false;
+            panelGame.Visible = false;
         }
 
         private void btnSolo_Click(object sender, EventArgs e)
@@ -41,8 +50,7 @@ namespace SeaBattle
         {
             currentGameMode = GameMode.Multiplayer;
             InitializeGame();
-            groupEhh.Visible = true;
-            ShowGamePanel();
+            ShowLobbyPanel();
         }
 
         private void InitializeGame()
@@ -337,7 +345,6 @@ namespace SeaBattle
         {
             ShowMainMenu();
             gameManager = null;
-            groupEhh.Visible= false;
         }
 
         private void buttonStartSolo_Click(object sender, EventArgs e)
@@ -368,6 +375,35 @@ namespace SeaBattle
             {
                 MessageBox.Show("Поражение! Ваши корабли уничтожены.", "Морской бой",
                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void btnBackToMtnu_Click(object sender, EventArgs e)
+        {
+            ShowMainMenu();
+        }
+
+        private void btnCreateLobby_Click(object sender, EventArgs e)
+        {
+            // проверка введен ли никнэйм
+            if (string.IsNullOrWhiteSpace(textBoxNickname.Text))
+            {
+                MessageBox.Show("Введите ваш ник!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // создаём и показываем форму
+            var createForm = new CreateLobbyForm();
+            if (createForm.ShowDialog() == DialogResult.OK)
+            {
+                // получаем данные из формы
+                string lobbyName = createForm.LobbyName;
+                bool isPrivate = createForm.IsPrivate;
+                string password = createForm.Password;
+
+                // 🔜 Здесь будет логика создания лобби (пока просто вывод)
+                MessageBox.Show($"Создано лобби:\nИмя: {lobbyName}\nТип: {(isPrivate ? "Закрытое" : "Открытое")}",
+                                "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
     }

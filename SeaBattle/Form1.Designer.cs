@@ -57,10 +57,17 @@
             btnMultiplayer = new Button();
             btnSolo = new Button();
             label6 = new Label();
+            panelLobby = new Panel();
+            btnBackToMtnu = new Button();
+            btnCreateLobby = new Button();
+            textBoxNickname = new TextBox();
+            labelNickname = new Label();
+            flowLayoutPanelLobbies = new FlowLayoutPanel();
             panel1.SuspendLayout();
             panelGame.SuspendLayout();
             groupEhh.SuspendLayout();
             panelMainMenu.SuspendLayout();
+            panelLobby.SuspendLayout();
             SuspendLayout();
             // 
             // enemyPanel
@@ -388,13 +395,13 @@
             btnMultiplayer.BackColor = Color.FromArgb(0, 0, 64);
             btnMultiplayer.Cursor = Cursors.Hand;
             btnMultiplayer.FlatStyle = FlatStyle.Flat;
-            btnMultiplayer.Font = new Font("Bookman Old Style", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnMultiplayer.Font = new Font("Bookman Old Style", 13.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
             btnMultiplayer.ForeColor = Color.FromArgb(192, 192, 255);
             btnMultiplayer.Location = new Point(264, 326);
             btnMultiplayer.Name = "btnMultiplayer";
             btnMultiplayer.Size = new Size(442, 65);
             btnMultiplayer.TabIndex = 2;
-            btnMultiplayer.Text = "Мультиплеерная игра";
+            btnMultiplayer.Text = "Мультиплеер";
             btnMultiplayer.UseVisualStyleBackColor = false;
             btnMultiplayer.Click += btnMultiplayer_Click;
             // 
@@ -403,7 +410,7 @@
             btnSolo.BackColor = Color.FromArgb(0, 0, 64);
             btnSolo.Cursor = Cursors.Hand;
             btnSolo.FlatStyle = FlatStyle.Flat;
-            btnSolo.Font = new Font("Bookman Old Style", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnSolo.Font = new Font("Bookman Old Style", 13.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
             btnSolo.ForeColor = Color.FromArgb(192, 192, 255);
             btnSolo.Location = new Point(264, 213);
             btnSolo.Name = "btnSolo";
@@ -424,11 +431,88 @@
             label6.TabIndex = 0;
             label6.Text = "Выберите режим игры";
             // 
+            // panelLobby
+            // 
+            panelLobby.BackColor = Color.FromArgb(0, 0, 64);
+            panelLobby.Controls.Add(btnBackToMtnu);
+            panelLobby.Controls.Add(btnCreateLobby);
+            panelLobby.Controls.Add(textBoxNickname);
+            panelLobby.Controls.Add(labelNickname);
+            panelLobby.Controls.Add(flowLayoutPanelLobbies);
+            panelLobby.Dock = DockStyle.Fill;
+            panelLobby.Location = new Point(0, 0);
+            panelLobby.Name = "panelLobby";
+            panelLobby.Size = new Size(982, 679);
+            panelLobby.TabIndex = 11;
+            panelLobby.Visible = false;
+            // 
+            // btnBackToMtnu
+            // 
+            btnBackToMtnu.BackColor = Color.FromArgb(0, 0, 64);
+            btnBackToMtnu.Cursor = Cursors.Hand;
+            btnBackToMtnu.FlatStyle = FlatStyle.Flat;
+            btnBackToMtnu.Font = new Font("Bookman Old Style", 13.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnBackToMtnu.ForeColor = Color.FromArgb(192, 192, 255);
+            btnBackToMtnu.Location = new Point(608, 573);
+            btnBackToMtnu.Name = "btnBackToMtnu";
+            btnBackToMtnu.Size = new Size(270, 50);
+            btnBackToMtnu.TabIndex = 10;
+            btnBackToMtnu.Text = "← Назад в меню";
+            btnBackToMtnu.UseVisualStyleBackColor = false;
+            btnBackToMtnu.Click += btnBackToMtnu_Click;
+            // 
+            // btnCreateLobby
+            // 
+            btnCreateLobby.BackColor = Color.FromArgb(0, 0, 64);
+            btnCreateLobby.Cursor = Cursors.Hand;
+            btnCreateLobby.FlatStyle = FlatStyle.Flat;
+            btnCreateLobby.Font = new Font("Bookman Old Style", 13.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnCreateLobby.ForeColor = Color.FromArgb(192, 192, 255);
+            btnCreateLobby.Location = new Point(134, 573);
+            btnCreateLobby.Name = "btnCreateLobby";
+            btnCreateLobby.Size = new Size(272, 50);
+            btnCreateLobby.TabIndex = 3;
+            btnCreateLobby.Text = "Создать лобби";
+            btnCreateLobby.UseVisualStyleBackColor = false;
+            btnCreateLobby.Click += btnCreateLobby_Click;
+            // 
+            // textBoxNickname
+            // 
+            textBoxNickname.BackColor = Color.White;
+            textBoxNickname.Cursor = Cursors.Hand;
+            textBoxNickname.Location = new Point(279, 64);
+            textBoxNickname.Name = "textBoxNickname";
+            textBoxNickname.Size = new Size(599, 27);
+            textBoxNickname.TabIndex = 2;
+            // 
+            // labelNickname
+            // 
+            labelNickname.AutoSize = true;
+            labelNickname.Font = new Font("Bookman Old Style", 13.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            labelNickname.ForeColor = Color.FromArgb(192, 192, 255);
+            labelNickname.Location = new Point(134, 61);
+            labelNickname.Name = "labelNickname";
+            labelNickname.Size = new Size(139, 28);
+            labelNickname.TabIndex = 1;
+            labelNickname.Text = "Nickname:";
+            // 
+            // flowLayoutPanelLobbies
+            // 
+            flowLayoutPanelLobbies.AutoScroll = true;
+            flowLayoutPanelLobbies.BackColor = Color.White;
+            flowLayoutPanelLobbies.FlowDirection = FlowDirection.TopDown;
+            flowLayoutPanelLobbies.Location = new Point(136, 133);
+            flowLayoutPanelLobbies.Name = "flowLayoutPanelLobbies";
+            flowLayoutPanelLobbies.Size = new Size(742, 392);
+            flowLayoutPanelLobbies.TabIndex = 0;
+            flowLayoutPanelLobbies.WrapContents = false;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(982, 679);
+            Controls.Add(panelLobby);
             Controls.Add(panelMainMenu);
             Controls.Add(panelGame);
             FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -443,6 +527,8 @@
             groupEhh.PerformLayout();
             panelMainMenu.ResumeLayout(false);
             panelMainMenu.PerformLayout();
+            panelLobby.ResumeLayout(false);
+            panelLobby.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -477,5 +563,11 @@
         private TextBox txtPort;
         private TextBox txtIP;
         private Label label7;
+        private Panel panelLobby;
+        private FlowLayoutPanel flowLayoutPanelLobbies;
+        private TextBox textBoxNickname;
+        private Label labelNickname;
+        private Button btnCreateLobby;
+        private Button btnBackToMtnu;
     }
 }
