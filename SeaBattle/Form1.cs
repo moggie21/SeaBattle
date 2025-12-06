@@ -37,6 +37,13 @@ namespace SeaBattle
             panelLobby.Visible = true;
             panelMainMenu.Visible = false;
             panelGame.Visible = false;
+
+            var testLobbies = new List<TestLobbyServer>
+            {
+                new TestLobbyServer("Заход", "127.0.0.1", 8888, false),
+                new TestLobbyServer("Секретная игра", "192.168.1.10", 9999, true, "12345")
+            };
+            UpdateLobbyList(testLobbies);
         }
 
         private void btnSolo_Click(object sender, EventArgs e)
@@ -404,6 +411,104 @@ namespace SeaBattle
                 // здесь будет логика создания лобби (пока просто вывод)
                 MessageBox.Show($"Создано лобби:\nИмя: {lobbyName}\nТип: {(isPrivate ? "Закрытое" : "Открытое")}",
                                 "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private Panel CreateLobbyItem(TestLobbyServer lobby)
+        {
+            // главная панель элемента
+            var itemPanel = new Panel
+            {
+                Size = new Size(725, 60),
+                BorderStyle = BorderStyle.FixedSingle,
+                Padding = new Padding(10),
+                BackColor = Color.FromArgb(0, 0, 64)
+            };
+
+            // название лобби
+            var nameLabel = new Label
+            {
+                Text = lobby.Name,
+                Font = new Font("Bookman Old Style", 13.8F, FontStyle.Bold, GraphicsUnit.Point, 0),
+                ForeColor = Color.FromArgb(192, 192, 255),
+                AutoSize = true,
+                Location = new Point(10, 12)
+            };
+
+            // открыто/закрыто
+            var statusLabel = new Label
+            {
+                Text = lobby.IsPrivate ? "Закрытое" : "Открытое",
+                Font = new Font("Bookman Old Style", 10F, FontStyle.Bold, GraphicsUnit.Point, 0),
+                ForeColor = lobby.IsPrivate ? Color.FromArgb(255, 192, 192) : Color.FromArgb(192, 255, 192),
+                AutoSize = true,
+                Location = new Point(420, 15)
+            };
+
+            // кнопка "Подключиться"
+            var joinButton = new Button
+            {
+                Text = "Подключиться",
+                Font = new Font("Bookman Old Style", 10F, FontStyle.Bold, GraphicsUnit.Point, 0),
+                Cursor = Cursors.Hand,
+                FlatStyle = FlatStyle.Flat,
+                ForeColor = Color.FromArgb(192, 192, 255),
+                BackColor = Color.FromArgb(0, 0, 64),
+                Size = new Size(160, 35),
+                Location = new Point(550, 10),
+                Tag = lobby // сохраняем ссылку на лобби
+            };
+            joinButton.Click += JoinButton_Click; 
+
+            // добавляем всё в панель
+            itemPanel.Controls.Add(nameLabel);
+            itemPanel.Controls.Add(statusLabel);
+            itemPanel.Controls.Add(joinButton);
+
+            return itemPanel;
+        }
+
+        private void JoinButton_Click(object sender, EventArgs e)
+        {
+            if (sender is not Button button || button.Tag is not TestLobbyServer lobby)
+                return;
+
+            // проверка на введеннй ник
+            if (string.IsNullOrWhiteSpace(textBoxNickname.Text))
+            {
+                MessageBox.Show("Введите ваш ник!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (lobby.IsPrivate)
+            {
+                // если закрытое то показываем форму ввода пароля
+                var joinForm = new JoinLobbyForm();
+                if (joinForm.ShowDialog() == DialogResult.OK)
+                {
+                    string password = joinForm.EnteredPassword;
+
+                    MessageBox.Show($"Подключаемся к закрытому лобби:\n{lobby.Name}",
+                                    "Подключение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            else
+            {
+                // открытое лобби — подключаемся сразу
+                MessageBox.Show($"Подключаемся к открытому лобби:\n{lobby.Name}",
+                                "Подключение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+        public void UpdateLobbyList(List<TestLobbyServer> lobbies)
+        {
+            // очищаем список
+            flowLayoutPanelLobbies.Controls.Clear();
+
+            // добавляем каждый элемент
+            foreach (var lobby in lobbies)
+            {
+                var item = CreateLobbyItem(lobby);
+                flowLayoutPanelLobbies.Controls.Add(item);
             }
         }
     }

@@ -453,7 +453,7 @@
             btnBackToMtnu.FlatStyle = FlatStyle.Flat;
             btnBackToMtnu.Font = new Font("Bookman Old Style", 13.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
             btnBackToMtnu.ForeColor = Color.FromArgb(192, 192, 255);
-            btnBackToMtnu.Location = new Point(608, 573);
+            btnBackToMtnu.Location = new Point(593, 573);
             btnBackToMtnu.Name = "btnBackToMtnu";
             btnBackToMtnu.Size = new Size(270, 50);
             btnBackToMtnu.TabIndex = 10;
@@ -468,7 +468,7 @@
             btnCreateLobby.FlatStyle = FlatStyle.Flat;
             btnCreateLobby.Font = new Font("Bookman Old Style", 13.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
             btnCreateLobby.ForeColor = Color.FromArgb(192, 192, 255);
-            btnCreateLobby.Location = new Point(134, 573);
+            btnCreateLobby.Location = new Point(119, 573);
             btnCreateLobby.Name = "btnCreateLobby";
             btnCreateLobby.Size = new Size(272, 50);
             btnCreateLobby.TabIndex = 3;
@@ -480,7 +480,7 @@
             // 
             textBoxNickname.BackColor = Color.White;
             textBoxNickname.Cursor = Cursors.Hand;
-            textBoxNickname.Location = new Point(279, 64);
+            textBoxNickname.Location = new Point(264, 64);
             textBoxNickname.Name = "textBoxNickname";
             textBoxNickname.Size = new Size(599, 27);
             textBoxNickname.TabIndex = 2;
@@ -490,7 +490,7 @@
             labelNickname.AutoSize = true;
             labelNickname.Font = new Font("Bookman Old Style", 13.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
             labelNickname.ForeColor = Color.FromArgb(192, 192, 255);
-            labelNickname.Location = new Point(134, 61);
+            labelNickname.Location = new Point(119, 61);
             labelNickname.Name = "labelNickname";
             labelNickname.Size = new Size(139, 28);
             labelNickname.TabIndex = 1;
@@ -501,8 +501,9 @@
             flowLayoutPanelLobbies.AutoScroll = true;
             flowLayoutPanelLobbies.BackColor = Color.White;
             flowLayoutPanelLobbies.FlowDirection = FlowDirection.TopDown;
-            flowLayoutPanelLobbies.Location = new Point(136, 133);
+            flowLayoutPanelLobbies.Location = new Point(121, 133);
             flowLayoutPanelLobbies.Name = "flowLayoutPanelLobbies";
+            flowLayoutPanelLobbies.Padding = new Padding(5);
             flowLayoutPanelLobbies.Size = new Size(742, 392);
             flowLayoutPanelLobbies.TabIndex = 0;
             flowLayoutPanelLobbies.WrapContents = false;
