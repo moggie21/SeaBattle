@@ -401,7 +401,7 @@ namespace SeaBattle
                 bool isPrivate = createForm.IsPrivate;
                 string password = createForm.Password;
 
-                // 🔜 Здесь будет логика создания лобби (пока просто вывод)
+                // здесь будет логика создания лобби (пока просто вывод)
                 MessageBox.Show($"Создано лобби:\nИмя: {lobbyName}\nТип: {(isPrivate ? "Закрытое" : "Открытое")}",
                                 "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }

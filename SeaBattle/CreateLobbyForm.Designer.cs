@@ -132,7 +132,7 @@
             FormBorderStyle = FormBorderStyle.FixedDialog;
             Name = "CreateLobbyForm";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "CreateLobbyForm";
+            Text = "Создание Лобби";
             ResumeLayout(false);
             PerformLayout();
         }
