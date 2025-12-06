@@ -44,6 +44,13 @@
             buttonNewGame = new Button();
             labelStatus = new Label();
             panelGame = new Panel();
+            groupEhh = new GroupBox();
+            btnJoin = new Button();
+            btnHost = new Button();
+            txtPort = new TextBox();
+            txtIP = new TextBox();
+            label7 = new Label();
+            label1 = new Label();
             buttonStartSolo = new Button();
             buttonBackToMenu = new Button();
             panelMainMenu = new Panel();
@@ -52,6 +59,7 @@
             label6 = new Label();
             panel1.SuspendLayout();
             panelGame.SuspendLayout();
+            groupEhh.SuspendLayout();
             panelMainMenu.SuspendLayout();
             SuspendLayout();
             // 
@@ -256,6 +264,7 @@
             // panelGame
             // 
             panelGame.BackColor = Color.White;
+            panelGame.Controls.Add(groupEhh);
             panelGame.Controls.Add(buttonStartSolo);
             panelGame.Controls.Add(buttonBackToMenu);
             panelGame.Controls.Add(labelStatus);
@@ -271,6 +280,73 @@
             panelGame.Size = new Size(982, 679);
             panelGame.TabIndex = 9;
             panelGame.Visible = false;
+            // 
+            // groupEhh
+            // 
+            groupEhh.BackColor = SystemColors.Control;
+            groupEhh.Controls.Add(btnJoin);
+            groupEhh.Controls.Add(btnHost);
+            groupEhh.Controls.Add(txtPort);
+            groupEhh.Controls.Add(txtIP);
+            groupEhh.Controls.Add(label7);
+            groupEhh.Controls.Add(label1);
+            groupEhh.Location = new Point(681, 455);
+            groupEhh.Name = "groupEhh";
+            groupEhh.Size = new Size(271, 196);
+            groupEhh.TabIndex = 11;
+            groupEhh.TabStop = false;
+            groupEhh.Text = "эхх";
+            groupEhh.Visible = false;
+            // 
+            // btnJoin
+            // 
+            btnJoin.Location = new Point(161, 140);
+            btnJoin.Name = "btnJoin";
+            btnJoin.Size = new Size(80, 29);
+            btnJoin.TabIndex = 5;
+            btnJoin.Text = "Join";
+            btnJoin.UseVisualStyleBackColor = true;
+            // 
+            // btnHost
+            // 
+            btnHost.Location = new Point(26, 140);
+            btnHost.Name = "btnHost";
+            btnHost.Size = new Size(80, 29);
+            btnHost.TabIndex = 4;
+            btnHost.Text = "Host";
+            btnHost.UseVisualStyleBackColor = true;
+            // 
+            // txtPort
+            // 
+            txtPort.Location = new Point(79, 76);
+            txtPort.Name = "txtPort";
+            txtPort.Size = new Size(171, 27);
+            txtPort.TabIndex = 3;
+            // 
+            // txtIP
+            // 
+            txtIP.Location = new Point(79, 31);
+            txtIP.Name = "txtIP";
+            txtIP.Size = new Size(171, 27);
+            txtIP.TabIndex = 2;
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new Point(15, 79);
+            label7.Name = "label7";
+            label7.Size = new Size(47, 20);
+            label7.TabIndex = 1;
+            label7.Text = "Порт:";
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(15, 34);
+            label1.Name = "label1";
+            label1.Size = new Size(24, 20);
+            label1.TabIndex = 0;
+            label1.Text = "IP:";
             // 
             // buttonStartSolo
             // 
@@ -363,6 +439,8 @@
             panel1.PerformLayout();
             panelGame.ResumeLayout(false);
             panelGame.PerformLayout();
+            groupEhh.ResumeLayout(false);
+            groupEhh.PerformLayout();
             panelMainMenu.ResumeLayout(false);
             panelMainMenu.PerformLayout();
             ResumeLayout(false);
@@ -392,5 +470,12 @@
         private Label label6;
         private Button buttonBackToMenu;
         private Button buttonStartSolo;
+        private GroupBox groupEhh;
+        private Label label1;
+        private Button btnJoin;
+        private Button btnHost;
+        private TextBox txtPort;
+        private TextBox txtIP;
+        private Label label7;
     }
 }

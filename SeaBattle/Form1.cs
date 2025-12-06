@@ -41,6 +41,7 @@ namespace SeaBattle
         {
             currentGameMode = GameMode.Multiplayer;
             InitializeGame();
+            groupEhh.Visible = true;
             ShowGamePanel();
         }
 
@@ -100,6 +101,11 @@ namespace SeaBattle
                     bool isVertical = radioVertical.Checked;
                     if (gameManager.PlayerBoard.PlaceShip(selectedShipLength.Value, r, c, isVertical))
                     {
+                        selectedShipLength = null;
+                        btnShip4.BackColor = SystemColors.Control;
+                        btnShip3.BackColor = SystemColors.Control;
+                        btnShip2.BackColor = SystemColors.Control;
+                        btnShip1.BackColor = SystemColors.Control;
                         RenderPlayerBoard();
                         UpdateStatus();
                         UpdateShipButtons();
@@ -114,10 +120,22 @@ namespace SeaBattle
             {
                 if (!isPlayerField)
                 {
+                    var state = gameManager.EnemyBoard.Grid[r, c];
+                    if (state == CellState.Miss || state == CellState.Hit || state == CellState.Sunk)
+                    {
+                        MessageBox.Show("Сюда уже стреляли!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
                     // стреляет по противнику
                     var (hit, result) = gameManager.PlayerShoot(r, c);
                     RenderEnemyBoard();
                     UpdateStatus();
+
+                    if (gameManager.State == GameState.GameOver)
+                    {
+                        ShowGameOverMessage();
+                        return;
+                    }
 
                     // если промах, то ходит бот
                     if (!hit || gameManager.State == GameState.EnemyTurn)
@@ -191,6 +209,12 @@ namespace SeaBattle
                     UpdateStatus();
 
                     if (gameManager.State == GameState.GameOver)
+                    {
+                        ShowGameOverMessage();
+                        return;
+                    }
+
+                    if (gameManager.State == GameState.GameOver)
                         return;
 
 
@@ -262,21 +286,26 @@ namespace SeaBattle
         private void btnShip4_Click(object sender, EventArgs e)
         {
             selectedShipLength = 4;
+            btnShip4.BackColor = Color.LightBlue;
         }
 
         private void btnShip3_Click(object sender, EventArgs e)
         {
             selectedShipLength = 3;
+            btnShip3.BackColor = Color.LightBlue;
+
         }
 
         private void btnShip2_Click(object sender, EventArgs e)
         {
             selectedShipLength = 2;
+            btnShip2.BackColor = Color.LightBlue;
         }
 
         private void btnShip1_Click(object sender, EventArgs e)
         {
             selectedShipLength = 1;
+            btnShip1.BackColor = Color.LightBlue;
         }
 
         private void UpdateShipButtons()
@@ -308,6 +337,7 @@ namespace SeaBattle
         {
             ShowMainMenu();
             gameManager = null;
+            groupEhh.Visible= false;
         }
 
         private void buttonStartSolo_Click(object sender, EventArgs e)
@@ -324,6 +354,20 @@ namespace SeaBattle
                 {
                     MessageBox.Show("Расставьте все корабли!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
+            }
+        }
+
+        private void ShowGameOverMessage()
+        {
+            if (gameManager.EnemyBoard.AllShipsSunk())
+            {
+                MessageBox.Show("Победа! Все корабли противника уничтожены!", "Морской бой",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else if (gameManager.PlayerBoard.AllShipsSunk())
+            {
+                MessageBox.Show("Поражение! Ваши корабли уничтожены.", "Морской бой",
+                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
     }
