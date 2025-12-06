@@ -131,6 +131,12 @@ namespace SeaBattle
                     RenderEnemyBoard();
                     UpdateStatus();
 
+                    if (gameManager.State == GameState.GameOver)
+                    {
+                        ShowGameOverMessage();
+                        return;
+                    }
+
                     // если промах, то ходит бот
                     if (!hit || gameManager.State == GameState.EnemyTurn)
                     {
@@ -201,6 +207,12 @@ namespace SeaBattle
                 {
                     RenderPlayerBoard();
                     UpdateStatus();
+
+                    if (gameManager.State == GameState.GameOver)
+                    {
+                        ShowGameOverMessage();
+                        return;
+                    }
 
                     if (gameManager.State == GameState.GameOver)
                         return;
@@ -342,6 +354,20 @@ namespace SeaBattle
                 {
                     MessageBox.Show("Расставьте все корабли!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
+            }
+        }
+
+        private void ShowGameOverMessage()
+        {
+            if (gameManager.EnemyBoard.AllShipsSunk())
+            {
+                MessageBox.Show("Победа! Все корабли противника уничтожены!", "Морской бой",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else if (gameManager.PlayerBoard.AllShipsSunk())
+            {
+                MessageBox.Show("Поражение! Ваши корабли уничтожены.", "Морской бой",
+                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
     }

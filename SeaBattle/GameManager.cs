@@ -16,6 +16,9 @@ namespace SeaBattle
 
     public class GameManager
     {
+        private (int row, int col)? lastHit = null;          // последнее попадание
+        private List<(int row, int col)> potentialTargets = new(); // направления для добивания
+        private (int, int)? hitDirection = null;             // направление корабля (если известно)
         public GameBoard PlayerBoard { get; private set; }
         public GameBoard EnemyBoard { get; private set; }
         public GameState State { get; private set; }
@@ -100,38 +103,129 @@ namespace SeaBattle
             if (State != GameState.EnemyTurn || PlayerBoard.PlacementComplete == false)
                 return (false, -1, -1, CellState.Empty);
 
-            var available = new List<(int r, int c)>();
-            for (int r = 0; r < 10; r++)
+            int targetRow = -1, targetCol = -1;
+
+            if (hitDirection != null)
             {
-                for (int c = 0; c < 10; c++)
+                var (dr, dc) = hitDirection.Value;
+                var (startR, startC) = lastHit.Value;
+
+                targetRow = startR + dr;
+                targetCol = startC + dc;
+
+                if (!IsValidTarget(targetRow, targetCol))
                 {
-                    var state = PlayerBoard.Grid[r, c];
-                    if (state != CellState.Miss && state != CellState.Hit && state != CellState.Sunk)
-                        available.Add((r, c));
+                    hitDirection = null;
+                    lastHit = null;
+                    potentialTargets.Clear();
+                    return EnemyShoot();
                 }
             }
-
-            if (available.Count == 0)
-                return (false, -1, -1, CellState.Empty);
-
-            var random = new Random();
-            var (targetRow, targetCol) = available[random.Next(available.Count)];
-            bool hit = PlayerBoard.Shoot(targetRow, targetCol, out var result);
-
-            if (hit && !PlayerBoard.AllShipsSunk())
+            else if (potentialTargets.Count > 0)
             {
-                State = GameState.EnemyTurn;
-            }
-            else if (!PlayerBoard.AllShipsSunk())
-            {
-                State = GameState.MyTurn;
+                var next = potentialTargets[0];
+                potentialTargets.RemoveAt(0);
+                targetRow = next.row;
+                targetCol = next.col;
+
+                if (!IsValidTarget(targetRow, targetCol))
+                {
+                    return EnemyShoot();
+                }
             }
             else
             {
-                State = GameState.GameOver;
+                var available = new List<(int r, int c)>();
+                for (int r = 0; r < 10; r++)
+                {
+                    for (int c = 0; c < 10; c++)
+                    {
+                        if (IsValidTarget(r, c))
+                            available.Add((r, c));
+                    }
+                }
+
+                if (available.Count == 0)
+                    return (false, -1, -1, CellState.Empty);
+
+                var random = new Random();
+                (targetRow, targetCol) = available[random.Next(available.Count)];
             }
 
+            bool hit = PlayerBoard.Shoot(targetRow, targetCol, out var result);
+
+            if (hit)
+            {
+                if (result == CellState.Sunk)
+                {
+                    lastHit = null;
+                    hitDirection = null;
+                    potentialTargets.Clear();
+                }
+                else
+                {
+                    if (lastHit == null)
+                    {
+                        lastHit = (targetRow, targetCol);
+                        AddSurroundingTargets(targetRow, targetCol);
+                    }
+                    else if (hitDirection == null)
+                    {
+                        var (prevR, prevC) = lastHit.Value;
+                        int dr = targetRow - prevR;
+                        int dc = targetCol - prevC;
+
+                        if (dr != 0) dr = Math.Sign(dr);
+                        if (dc != 0) dc = Math.Sign(dc);
+
+                        hitDirection = (dr, dc);
+                        lastHit = (targetRow, targetCol);
+                    }
+                    else
+                    {
+                        lastHit = (targetRow, targetCol);
+                    }
+
+                    State = GameState.EnemyTurn;
+                }
+            }
+            else
+            {
+                if (hitDirection != null)
+                {
+                    hitDirection = null;
+                    lastHit = null;
+                    potentialTargets.Clear();
+                }
+                State = GameState.MyTurn;
+            }
+
+            if (PlayerBoard.AllShipsSunk())
+                State = GameState.GameOver;
+
             return (hit, targetRow, targetCol, result);
+        }
+
+        private bool IsValidTarget(int r, int c)
+        {
+            if (r < 0 || r >= 10 || c < 0 || c >= 10)
+                return false;
+            var state = PlayerBoard.Grid[r, c];
+            return state != CellState.Miss && state != CellState.Hit && state != CellState.Sunk;
+        }
+
+        private void AddSurroundingTargets(int r, int c)
+        {
+            var directions = new (int dr, int dc)[] { (-1, 0), (1, 0), (0, -1), (0, 1) };
+            foreach (var (dr, dc) in directions)
+            {
+                int nr = r + dr;
+                int nc = c + dc;
+                if (IsValidTarget(nr, nc))
+                {
+                    potentialTargets.Add((nr, nc));
+                }
+            }
         }
     }
 }
