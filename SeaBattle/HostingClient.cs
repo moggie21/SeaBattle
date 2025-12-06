@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SeaBattle
 {
-    internal class HostingClient
+    public class HostingClient
     {
         private Form1 form;
         private TcpClient tcpClient;
@@ -18,6 +18,7 @@ namespace SeaBattle
         public HostingClient(Form1 form, string address, int port)
         {
             this.tcpClient = new TcpClient(address, port);
+            Console.WriteLine("cсоздание клиентаб подключение = ", tcpClient.Connected);
             this.form = form;
         }
 
@@ -64,14 +65,15 @@ namespace SeaBattle
             {
                 List<LobbyServer> users = JsonConvert.DeserializeObject<List<LobbyServer>>(JSON);
                 //обновление списка лобби в форме
+                form.UpdateLobbyList(users);
             }
             catch (Exception ex) { Console.WriteLine("Recieved messege is not UserList"); }
         }
 
-        public async Task CreateNewLobby(string message)
+        public async Task CreateNewLobby(string name, string ip, int port, bool isPrivate, string password)
         {
             //создание лобби. Открытие окна ожидания. 
-            LobbyServer newLobby = new LobbyServer("name", "hashedIp", "port");
+            LobbyServer newLobby = new LobbyServer(name, AESEncryptor.Encrypt(ip, password), port, isPrivate);
             //оповещение хостинга о новом лобби
             byte[] buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(newLobby));
             if (buffer != null)
@@ -82,6 +84,7 @@ namespace SeaBattle
         {
             // Подразумевается, что ip port сервера хостинга не меняются и известны заранее.
             HostingClient client = new HostingClient(form, serverIp, serverPort);
+            form.hostingClient = client;
             await client.ListenForMessagesAsync();
 
             Console.WriteLine("Клиент завершил свою работу");

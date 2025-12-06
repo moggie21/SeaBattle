@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,21 +11,40 @@ namespace SeaBattle
 {
     internal class ClientPlayer
     {
-
+        private PlayerInfo enemyInfo;
+        private PlayerInfo player;
         private Form1 form;
-        private TcpClient tcpClient;
+        private TcpClient enemyClient;
+        private GameManagerServer gameManager;
         public bool isConnected = true;
 
         public ClientPlayer(Form1 form, string address, int port)
         {
-            this.tcpClient = new TcpClient(address, port);
+            this.enemyClient = new TcpClient(address, port);
             this.form = form;
-            this.isConnected = this.tcpClient.Connected;
+            this.isConnected = this.enemyClient.Connected;
         }
 
         public async Task ListenForMessagesAsync()
         {
-            while (isConnected && tcpClient.Connected)
+            byte[] buffer = null;
+            // ожидаем информацию о противнике
+            buffer = new byte[enemyClient.ReceiveBufferSize];
+            int bytesRead = await enemyClient.GetStream().ReadAsync(buffer, 0, buffer.Length);
+            if (bytesRead > 0)
+            {
+                string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                enemyInfo = JsonConvert.DeserializeObject<PlayerInfo>(message);
+            }
+            // передаём игформацию об игроке
+            buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(player));
+            _ = enemyClient.GetStream().WriteAsync(buffer, 0, buffer.Length);
+
+            NetworkStream stream = enemyClient.GetStream();
+            buffer = new byte[enemyClient.ReceiveBufferSize];
+            bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);//enemyboard
+            while (!gameManager.TryFinishPlacement()) { }
+            while (isConnected && enemyClient.Connected)
             {
                 try
                 {
@@ -32,14 +53,16 @@ namespace SeaBattle
                     // поочерёдные вызовы функции передачи информации о действии игроков в соответствии с gameManager
 
 
-                    //NetworkStream stream = tcpClient.GetStream();
+                    stream = enemyClient.GetStream();
 
-                    //byte[] buffer = new byte[tcpClient.ReceiveBufferSize];
-                    //int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
-                    //if (bytesRead > 0)
-                    //{
-                    //    string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                    //}
+                    buffer = new byte[enemyClient.ReceiveBufferSize];
+                    bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+                    string dataReceived = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                    if (bytesRead > 0)
+                    {
+                        (int, int) shot = JsonConvert.DeserializeObject<(int, int)>(dataReceived);
+                        gameManager.ShootingController(shot.Item1, shot.Item2, gameManager.PlayerBoard);
+                    }
                 }
                 catch (IOException ioEx)
                 {
@@ -54,12 +77,24 @@ namespace SeaBattle
             }
         }
 
+        public void SendBoard()
+        {
+            byte[] buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(gameManager.PlayerBoard));
+            _ = enemyClient.GetStream().WriteAsync(buffer, 0, buffer.Length);
+        }
+
+        public void SendShootCoords(int row, int col)
+        {
+            byte[] buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject((row, col)));
+            _ = enemyClient.GetStream().WriteAsync(buffer, 0, buffer.Length);
+        }
+
         public async void Disconnect()
         {
             byte[] buffer = Encoding.UTF8.GetBytes("QUIT");
             isConnected = false;
-            await tcpClient.GetStream().WriteAsync(buffer, 0, buffer.Length);
-            tcpClient.Close();
+            await enemyClient.GetStream().WriteAsync(buffer, 0, buffer.Length);
+            enemyClient.Close();
         }
 
         public static async Task Main(Form1 form, string serverIp, int serverPort)

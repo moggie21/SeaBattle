@@ -9,8 +9,9 @@ using System.Threading.Tasks;
 
 namespace SeaBattle
 {
-    internal class HostPlayer
+    public class HostPlayer
     {
+        private GameManagerServer gameManager;
         private TcpListener listener;
         private TcpClient enemyClient;
         private PlayerInfo enemyInfo;
@@ -21,6 +22,7 @@ namespace SeaBattle
         {
             listener = new TcpListener(IPAddress.Parse(localAddr), port);
             listener.Start();
+            Console.WriteLine("Listener Started! Waiting PlayerConnections");
             _ = AcceptClientsAsync();
         }
 
@@ -49,29 +51,34 @@ namespace SeaBattle
 
         private async Task HandleClient()
         {
+            Console.WriteLine("Ожидаем информацию о вражеской расстановке доски.");
+            NetworkStream stream = enemyClient.GetStream();
+            byte[] buffer = new byte[enemyClient.ReceiveBufferSize];
+            int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);//enemyboard
+            gameManager.SetEnemyBoard(JsonConvert.DeserializeObject<GameBoard>(Encoding.UTF8.GetString(buffer, 0, bytesRead)));
+            while (!gameManager.TryFinishPlacement()) { }
             while (inGame)
             {
                 try
                 {
-                    // обработка логики игры
-                    // поочерёдные вызовы функции передачи информации о действии игроков в соответствии с gameManager
+                    buffer = new byte[enemyClient.ReceiveBufferSize];
+                    bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
 
-
-                    //NetworkStream stream = enemyClient.GetStream();
-
-                    //byte[] buffer = new byte[enemyClient.ReceiveBufferSize];
-                    //int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
-
-                    //if (bytesRead > 0)
-                    //{
-                    //    string dataReceived = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                    //    if (dataReceived == "QUIT")
-                    //    {
-                    //        inGame = false;
-                    //        //обработка победы при выходе противника
-                    //        enemyClient.Close();
-                    //    }
-                    //}
+                    if (bytesRead > 0)
+                    {
+                        string dataReceived = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                        if (dataReceived == "QUIT")
+                        {
+                            inGame = false;
+                            //обработка победы при выходе противника
+                            enemyClient.Close();
+                        }
+                        else
+                        {
+                            (int, int) shot = JsonConvert.DeserializeObject<(int, int)>(dataReceived);
+                            gameManager.ShootingController(shot.Item1, shot.Item2, gameManager.PlayerBoard);
+                        }
+                    }
                 }
 
                 catch (IOException ex)
@@ -79,7 +86,7 @@ namespace SeaBattle
                     Console.WriteLine("Исключение при приёме данных (Юзер отключен): " + ex.Message);
 
                     inGame = false;
-                    //обработка победы при выходе противника
+                    //обработка действий при выходе противника
                     enemyClient.Close();
                     break;
                 }
@@ -88,13 +95,24 @@ namespace SeaBattle
                     Console.WriteLine($"Общая ошибка при обработке клиента: {ex.Message}");
 
                     inGame = false;
-                    //обработка победы при выходе противника
+                    //обработка действий при выходе противника
                     enemyClient.Close();
                     break;
                 }
             }
         }
 
+        public void SendBoard()
+        {
+            byte[] buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(gameManager.PlayerBoard));
+            _ = enemyClient.GetStream().WriteAsync(buffer, 0, buffer.Length);
+        }
+
+        public void SendShootCoords(int row, int col)
+        {
+            byte[] buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject((row,col)));
+            _ = enemyClient.GetStream().WriteAsync(buffer, 0, buffer.Length);
+        }
 
         public void StopListening()
         {
@@ -104,8 +122,7 @@ namespace SeaBattle
 
         public HostPlayer(int port = 9000, string localAddr = "26.115.23.91")
         {
-            //определение ip и свободного порта
-
+            Console.WriteLine("Запущен сервер на ", localAddr, port);
             this.StartListening(port, localAddr);
         }
 

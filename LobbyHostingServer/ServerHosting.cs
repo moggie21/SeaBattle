@@ -15,13 +15,15 @@ namespace LobbyHostingServer
     {
         private TcpListener listener;
         private List<TcpClient> curActiveClients;
-        private List<LobbyServer> curActiveLobbies;
+        private List<LobbyServer> curActiveLobbies = new List<LobbyServer>();
 
         public void StartListening(int port, string localAddr)
         {
             listener = new TcpListener(IPAddress.Parse(localAddr), port);
             listener.Start();
+            Console.WriteLine("listener Started");
             _ = AcceptClientsAsync();
+            
         }
 
         private async Task AcceptClientsAsync()
@@ -127,6 +129,7 @@ namespace LobbyHostingServer
             listener?.Stop();
         }
 
+        // Ip и port статичны и должны быть известны заранее
         public ServerHosting(int port = 9000, string localAddr = "26.115.23.91")
         {
             this.StartListening(port, localAddr);

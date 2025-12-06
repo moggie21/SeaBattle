@@ -7,6 +7,7 @@ public class AESEncryptor
     public static string Encrypt(string plainText, string password)
     {
         // Генерируем ключ из пароля
+        if (password == null || password.Length == 0) password = "StandartPassword123";
         byte[] key;
         byte[] salt = GenerateSalt();
         using (Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(password, salt))
@@ -44,6 +45,7 @@ public class AESEncryptor
     // Метод дешифрования
     public static string Decrypt(string cipherText, string password)
     {
+        if (password == null || password.Length == 0) password = "StandartPassword123";
         byte[] cipherTextBytes = Convert.FromBase64String(cipherText);
 
         // Извлекаем salt и IV

@@ -1,9 +1,14 @@
+using System.ComponentModel;
+using System.Net;
+using System.Net.Sockets;
 using System.Windows.Forms;
 
 namespace SeaBattle
 {
     public partial class Form1 : Form
     {
+        public HostingClient hostingClient;
+        public HostPlayer lobbyServer;
         private GameManager gameManager;
         private GameMode currentGameMode = GameMode.None;
         private Panel[,] playerCells = new Panel[10, 10];
@@ -38,10 +43,10 @@ namespace SeaBattle
             panelMainMenu.Visible = false;
             panelGame.Visible = false;
 
-            var testLobbies = new List<TestLobbyServer>
+            var testLobbies = new List<LobbyServer>
             {
-                new TestLobbyServer("Заход", "127.0.0.1", 8888, false),
-                new TestLobbyServer("Секретная игра", "192.168.1.10", 9999, true, "12345")
+                new LobbyServer("Заход", "127.0.0.1", 8888, false),
+                new LobbyServer("Секретная игра", "192.168.1.10", 9999, true)
             };
             UpdateLobbyList(testLobbies);
         }
@@ -56,7 +61,8 @@ namespace SeaBattle
         private void btnMultiplayer_Click(object sender, EventArgs e)
         {
             currentGameMode = GameMode.Multiplayer;
-            InitializeGame();
+            //InitializeGame();
+            _ = HostingClient.Main(this, "26.115.23.91", 9000);
             ShowLobbyPanel();
         }
 
@@ -388,6 +394,14 @@ namespace SeaBattle
         private void btnBackToMtnu_Click(object sender, EventArgs e)
         {
             ShowMainMenu();
+            if (hostingClient  != null)
+                hostingClient.Disconnect();
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            if (hostingClient != null) hostingClient.Disconnect();
         }
 
         private void btnCreateLobby_Click(object sender, EventArgs e)
@@ -409,12 +423,23 @@ namespace SeaBattle
                 string password = createForm.Password;
 
                 // здесь будет логика создания лобби (пока просто вывод)
+                string hostName = Dns.GetHostName();
+                IPHostEntry hostEntry = Dns.GetHostEntry(hostName);
+                IPAddress localIpAddress = hostEntry.AddressList.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork);
+                Console.WriteLine("Local Adress for Lobby is:", localIpAddress.ToString());
+
+                TcpListener listener = new TcpListener(IPAddress.Any, 0);
+                listener.Start();
+                int freePort = ((IPEndPoint)listener.LocalEndpoint).Port;
+                listener.Stop();
+
+                _ = hostingClient.CreateNewLobby(lobbyName, localIpAddress.ToString(), freePort, isPrivate, password);
                 MessageBox.Show($"Создано лобби:\nИмя: {lobbyName}\nТип: {(isPrivate ? "Закрытое" : "Открытое")}",
                                 "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
-        private Panel CreateLobbyItem(TestLobbyServer lobby)
+        private Panel CreateLobbyItem(LobbyServer lobby)
         {
             // главная панель элемента
             var itemPanel = new Panel
@@ -470,7 +495,7 @@ namespace SeaBattle
 
         private void JoinButton_Click(object sender, EventArgs e)
         {
-            if (sender is not Button button || button.Tag is not TestLobbyServer lobby)
+            if (sender is not Button button || button.Tag is not LobbyServer lobby)
                 return;
 
             // проверка на введеннй ник
@@ -499,16 +524,19 @@ namespace SeaBattle
                                 "Подключение", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
-        public void UpdateLobbyList(List<TestLobbyServer> lobbies)
+        public void UpdateLobbyList(List<LobbyServer> lobbies)
         {
             // очищаем список
             flowLayoutPanelLobbies.Controls.Clear();
 
             // добавляем каждый элемент
-            foreach (var lobby in lobbies)
+            if (lobbies != null)
             {
-                var item = CreateLobbyItem(lobby);
-                flowLayoutPanelLobbies.Controls.Add(item);
+                foreach (var lobby in lobbies)
+                {
+                    var item = CreateLobbyItem(lobby);
+                    flowLayoutPanelLobbies.Controls.Add(item);
+                }
             }
         }
     }
