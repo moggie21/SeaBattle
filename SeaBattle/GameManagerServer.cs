@@ -3,22 +3,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace SeaBattle
 {
-    internal class GameManagerServer
+    public class GameManagerServer
     {
         public GameBoard PlayerBoard { get; private set; }
         public GameBoard EnemyBoard { get; private set; }
         public GameState State { get; private set; }
+        private Form1 form;
 
-        public GameManagerServer()
+        public GameManagerServer(Form1 form)
         {
             PlayerBoard = new GameBoard();
             EnemyBoard = new GameBoard();
-            State = GameState.Placement;
+            State = GameState.ServerWait;
+            this.form = form;
         }
 
+        public void PlayerConnected()
+        {
+            State = GameState.Placement;
+            form.UpdateCurState(State);
+        }
         public void SetEnemyBoard(GameBoard neb)
         {
             EnemyBoard = neb;
@@ -34,6 +42,7 @@ namespace SeaBattle
                 return false;
             EnemyBoard.FinishPlacement();
             State = GameState.MyTurn;
+            form.UpdateCurState(State);
             return true;
         }
 
@@ -87,6 +96,7 @@ namespace SeaBattle
                 State = GameState.GameOver;
             }
 
+            form.UpdateCurState(State);
             return (hit, result);
         }
 

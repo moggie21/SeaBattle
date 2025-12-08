@@ -13,13 +13,14 @@ namespace SeaBattle
     {
         private Form1 form;
         private TcpClient tcpClient;
-        bool isConnected = true;
+        public bool isConnected = true;
 
         public HostingClient(Form1 form, string address, int port)
         {
-            this.tcpClient = new TcpClient(address, port);
-            Console.WriteLine("cсоздание клиентаб подключение = ", tcpClient.Connected);
+            tcpClient = new TcpClient(address, port);
+            Console.WriteLine("cоздание клиента, подключение = ", tcpClient.Connected);
             this.form = form;
+            bool isConnected = tcpClient.Connected;
         }
 
         public async Task ListenForMessagesAsync()
@@ -55,8 +56,11 @@ namespace SeaBattle
         {
             byte[] buffer = Encoding.UTF8.GetBytes("QUIT");
             isConnected = false;
-            await tcpClient.GetStream().WriteAsync(buffer, 0, buffer.Length);
-            tcpClient.Close();
+            try { 
+                await tcpClient.GetStream().WriteAsync(buffer, 0, buffer.Length);
+                tcpClient.Close();
+            }
+            catch { };
         }
 
         public void NewLobbyAdded(string JSON)

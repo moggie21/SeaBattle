@@ -367,6 +367,7 @@
             buttonStartSolo.Text = "В бой";
             buttonStartSolo.UseVisualStyleBackColor = false;
             buttonStartSolo.Click += buttonStartSolo_Click;
+            buttonStartSolo.Click += buttonStartMultiplayer_Click;
             // 
             // buttonBackToMenu
             // 
@@ -459,7 +460,7 @@
             btnBackToMtnu.TabIndex = 10;
             btnBackToMtnu.Text = "← Назад в меню";
             btnBackToMtnu.UseVisualStyleBackColor = false;
-            btnBackToMtnu.Click += btnBackToMtnu_Click;
+            btnBackToMtnu.Click += btnBackToMenu_Click;
             // 
             // btnCreateLobby
             // 

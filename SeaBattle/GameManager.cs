@@ -11,7 +11,8 @@ namespace SeaBattle
         Placement,      // расстановка кораблей
         MyTurn,         // мой ход
         EnemyTurn,      // ход противника (бота)
-        GameOver
+        GameOver,
+        ServerWait
     }
 
     public class GameManager
@@ -22,12 +23,15 @@ namespace SeaBattle
         public GameBoard PlayerBoard { get; private set; }
         public GameBoard EnemyBoard { get; private set; }
         public GameState State { get; private set; }
+        private Form1 form;
 
-        public GameManager()
+        public GameManager(Form1 f)
         {
             PlayerBoard = new GameBoard();
             EnemyBoard = new GameBoard();
             State = GameState.Placement;
+            form = f;
+            form.UpdateCurState(State);
         }
 
         // проверка на то, все ли игроки закончили с растоновкой
@@ -42,6 +46,7 @@ namespace SeaBattle
             EnemyBoard.FinishPlacement();
 
             State = GameState.MyTurn;
+            form.UpdateCurState(State);
             return true;
         }
 
@@ -94,6 +99,7 @@ namespace SeaBattle
                 State = GameState.GameOver;
             }
 
+            form.UpdateCurState(State);
             return (hit, result);
         }
 
@@ -203,6 +209,7 @@ namespace SeaBattle
             if (PlayerBoard.AllShipsSunk())
                 State = GameState.GameOver;
 
+            form.UpdateCurState(State);
             return (hit, targetRow, targetCol, result);
         }
 

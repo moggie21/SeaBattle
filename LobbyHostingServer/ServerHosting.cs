@@ -15,7 +15,7 @@ namespace LobbyHostingServer
     {
         private TcpListener listener;
         private List<TcpClient> curActiveClients;
-        private List<LobbyServer> curActiveLobbies = new List<LobbyServer>();
+        private List<(TcpClient, LobbyServer)> curActiveLobbies = new List<(TcpClient, LobbyServer)>();
 
         public void StartListening(int port, string localAddr)
         {
@@ -69,6 +69,7 @@ namespace LobbyHostingServer
                         if (dataReceived == "QUIT")
                         {
                             curActiveClients.Remove(client);
+                            ClientExit(client);
                             client.Close();
                         }
                         else
@@ -76,7 +77,7 @@ namespace LobbyHostingServer
                             try
                             {
                                 LobbyServer new_lobby = JsonConvert.DeserializeObject<LobbyServer>(dataReceived);
-                                curActiveLobbies.Add(new_lobby);
+                                curActiveLobbies.Add((client,new_lobby));
                                 LobbyListUpdate();
                             }
                             catch (Exception ex)
@@ -92,6 +93,7 @@ namespace LobbyHostingServer
                 {
                     Console.WriteLine("Исключение при приёме данных (Юзер отключен): " + ex.Message);
                     curActiveClients.Remove(client);
+                    ClientExit(client);
                     client.Close();
                     break;
                 }
@@ -99,8 +101,19 @@ namespace LobbyHostingServer
                 {
                     Console.WriteLine($"Общая ошибка при обработке клиента: {ex.Message}");
                     curActiveClients.Remove(client);
+                    ClientExit(client);
                     client.Close();
                     break;
+                }
+            }
+        }
+
+        private void ClientExit(TcpClient tcpClient)
+        {
+            for (int i = 0; i < curActiveLobbies.Count; i++)
+            {
+                if (curActiveLobbies[i].Item1 == tcpClient) { 
+                    curActiveLobbies.Remove(curActiveLobbies[i]);
                 }
             }
         }
@@ -109,9 +122,14 @@ namespace LobbyHostingServer
         private async void LobbyListUpdate()
         {
             byte[] buffer = null;
+            List<LobbyServer> lobies = new List<LobbyServer>();
+            for (int i = 0; i < curActiveLobbies.Count; i++)
+            {
+                lobies.Add(curActiveLobbies[i].Item2);
+            }
             try
             {
-                buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(curActiveLobbies));
+                buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(lobies));
                 foreach (TcpClient actClient in curActiveClients)
                 {
                     _ = actClient.GetStream().WriteAsync(buffer, 0, buffer.Length);

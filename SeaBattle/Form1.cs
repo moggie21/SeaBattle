@@ -10,6 +10,8 @@ namespace SeaBattle
         public HostingClient hostingClient;
         public HostPlayer lobbyServer;
         private GameManager gameManager;
+        private GameManagerServer gameManagerServer;
+        private GameState curState;
         private GameMode currentGameMode = GameMode.None;
         private Panel[,] playerCells = new Panel[10, 10];
         private Panel[,] enemyCells = new Panel[10, 10];
@@ -45,8 +47,8 @@ namespace SeaBattle
 
             var testLobbies = new List<LobbyServer>
             {
-                new LobbyServer("Заход", "127.0.0.1", 8888, false),
-                new LobbyServer("Секретная игра", "192.168.1.10", 9999, true)
+                new LobbyServer("Ошибка подключения к серверу", "127.0.0.1", 8888, true),
+                new LobbyServer("Попробуйте ещё раз", "192.168.1.10", 9999, true)
             };
             UpdateLobbyList(testLobbies);
         }
@@ -62,18 +64,39 @@ namespace SeaBattle
         {
             currentGameMode = GameMode.Multiplayer;
             //InitializeGame();
+            Console.WriteLine("Подключение к серверу хостинга;");
             _ = HostingClient.Main(this, "26.115.23.91", 9000);
+            if (hostingClient == null || !hostingClient.isConnected)
+            {
+                MessageBox.Show("При подключении возьникла ошибка. Попробуйте зайти позже!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
             ShowLobbyPanel();
         }
 
         private void InitializeGame()
         {
-            gameManager = new GameManager();
+            gameManager = new GameManager(this);
 
             CreateGrid(playerPanel, playerCells, isPlayer: true);
             CreateGrid(enemyPanel, enemyCells, isPlayer: false);
             UpdateStatus();
             UpdateShipButtons();
+        }
+        
+        public void InitializeOnlineGame()
+        {
+            Console.WriteLine("Инициализация онлайн игры");
+            gameManagerServer = new GameManagerServer(this);
+
+            CreateGrid(playerPanel, playerCells, isPlayer: true);
+            CreateGrid(enemyPanel, enemyCells, isPlayer: false);
+            UpdateStatus();
+            UpdateShipButtons();
+        }
+
+        public void UpdateCurState(GameState state)
+        {
+            curState = state;
         }
 
         private void CreateGrid(TableLayoutPanel panel, Panel[,] cells, bool isPlayer)
@@ -115,12 +138,17 @@ namespace SeaBattle
 
             var (r, c, isPlayerField) = ((int, int, bool))panel.Tag;
 
-            if (gameManager.State == GameState.Placement)
+            if (curState == GameState.Placement)
             {
                 if (isPlayerField && selectedShipLength.HasValue)
                 {
+                    GameBoard board;
+                    if (currentGameMode == GameMode.Solo)
+                        board = gameManager.PlayerBoard;
+                    else
+                        board = gameManagerServer.PlayerBoard;
                     bool isVertical = radioVertical.Checked;
-                    if (gameManager.PlayerBoard.PlaceShip(selectedShipLength.Value, r, c, isVertical))
+                    if (board.PlaceShip(selectedShipLength.Value, r, c, isVertical))
                     {
                         selectedShipLength = null;
                         btnShip4.BackColor = SystemColors.Control;
@@ -137,29 +165,38 @@ namespace SeaBattle
                     }
                 }
             }
-            else if (gameManager.State == GameState.MyTurn)
+            else if (curState == GameState.MyTurn)
             {
                 if (!isPlayerField)
                 {
-                    var state = gameManager.EnemyBoard.Grid[r, c];
+                    GameBoard board;
+                    if (currentGameMode == GameMode.Solo)
+                        board = gameManager.EnemyBoard;
+                    else
+                        board = gameManagerServer.EnemyBoard;
+                    var state = board.Grid[r, c];
                     if (state == CellState.Miss || state == CellState.Hit || state == CellState.Sunk)
                     {
                         MessageBox.Show("Сюда уже стреляли!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         return;
                     }
                     // стреляет по противнику
-                    var (hit, result) = gameManager.PlayerShoot(r, c);
+                    bool hit;
+                    if (currentGameMode == GameMode.Solo)
+                        (hit, _) = gameManager.PlayerShoot(r, c);
+                    else
+                        (hit, _) = gameManagerServer.ShootingController(r, c, gameManagerServer.EnemyBoard);
                     RenderEnemyBoard();
                     UpdateStatus();
 
-                    if (gameManager.State == GameState.GameOver)
+                    if (curState == GameState.GameOver)
                     {
                         ShowGameOverMessage();
                         return;
                     }
 
                     // если промах, то ходит бот
-                    if (!hit || gameManager.State == GameState.EnemyTurn)
+                    if ((!hit || curState == GameState.EnemyTurn) && currentGameMode == GameMode.Solo)
                     {
                         ProcessEnemyTurn();
                     }
@@ -169,7 +206,7 @@ namespace SeaBattle
 
         private void PlayerCell_MouseEnter(object sender, EventArgs e)
         {
-            if (gameManager.State != GameState.Placement || !selectedShipLength.HasValue)
+            if (curState != GameState.Placement || !selectedShipLength.HasValue)
                 return;
 
             if (sender is not Panel panel || panel.Tag is not (int r, int c, bool isPlayer) || !isPlayer)
@@ -195,7 +232,12 @@ namespace SeaBattle
             bool inBounds = previewCells.All(pos => pos.Item1 >= 0 && pos.Item1 < 10 && pos.Item2 >= 0 && pos.Item2 < 10);
 
             // можно ли разместить 
-            bool canPlace = inBounds && gameManager.PlayerBoard.CanPlaceShip(length, r, c, isVertical);
+            GameBoard board;
+            if (currentGameMode == GameMode.Solo)
+                board = gameManager.PlayerBoard;
+            else
+                board = gameManagerServer.PlayerBoard;
+            bool canPlace = inBounds && board.CanPlaceShip(length, r, c, isVertical);
 
             // подсветка клетки
             foreach (var (row, col) in previewCells)
@@ -210,15 +252,16 @@ namespace SeaBattle
 
         private void PlayerCell_MouseLeave(object sender, EventArgs e)
         {
-            if (gameManager.State != GameState.Placement)
+            if (curState != GameState.Placement)
                 return;
 
             RenderPlayerBoard();
         }
 
+
         private void ProcessEnemyTurn()
         {
-            if (gameManager.State != GameState.EnemyTurn) return;
+            if (curState != GameState.EnemyTurn) return;
 
             System.Threading.Tasks.Task.Delay(500).ContinueWith(_ =>
             {
@@ -229,23 +272,15 @@ namespace SeaBattle
                     RenderPlayerBoard();
                     UpdateStatus();
 
-                    if (gameManager.State == GameState.GameOver)
+                    if (curState == GameState.GameOver)
                     {
                         ShowGameOverMessage();
                         return;
                     }
 
-                    if (gameManager.State == GameState.GameOver)
-                        return;
-
-
-                    if (gameManager.State == GameState.EnemyTurn)
+                    if (curState == GameState.EnemyTurn)
                     {
                         ProcessEnemyTurn();
-                    }
-                    else if (gameManager.State == GameState.MyTurn)
-                    {
-                        // Ход игрока
                     }
                 }));
             });
@@ -253,7 +288,12 @@ namespace SeaBattle
 
         private void RenderPlayerBoard()
         {
-            var grid = gameManager.PlayerBoard.Grid;
+            GameBoard board;
+            if (currentGameMode == GameMode.Solo)
+                board = gameManager.PlayerBoard;
+            else
+                board = gameManagerServer.PlayerBoard;
+            var grid = board.Grid;
             for (int r = 0; r < 10; r++)
             {
                 for (int c = 0; c < 10; c++)
@@ -272,7 +312,12 @@ namespace SeaBattle
 
         private void RenderEnemyBoard()
         {
-            var grid = gameManager.EnemyBoard.Grid;
+            GameBoard board;
+            if (currentGameMode == GameMode.Solo)
+                board = gameManager.EnemyBoard;
+            else
+                board = gameManagerServer.EnemyBoard;
+            var grid = board.Grid;
             for (int r = 0; r < 10; r++)
             {
                 for (int c = 0; c < 10; c++)
@@ -290,12 +335,13 @@ namespace SeaBattle
 
         private void UpdateStatus()
         {
-            string status = gameManager.State switch
+            string status = curState switch
             {
                 GameState.Placement => "Расстановка кораблей. Выберите корабль и кликните на поле.",
                 GameState.MyTurn => "Ваш ход",
                 GameState.EnemyTurn => "Ход противника...",
-                GameState.GameOver => gameManager.EnemyBoard.AllShipsSunk()
+                GameState.ServerWait => "Ожидание подключения оппонента.",
+                GameState.GameOver => (currentGameMode == GameMode.Solo ? gameManager.EnemyBoard.AllShipsSunk() : gameManagerServer.EnemyBoard.AllShipsSunk())
                     ? "Победа! Все корабли противника уничтожены!"
                     : "Поражение! Ваши корабли уничтожены.",
                 _ => "Игра"
@@ -331,9 +377,13 @@ namespace SeaBattle
 
         private void UpdateShipButtons()
         {
-            if (gameManager.State != GameState.Placement) return;
+            if (curState != GameState.Placement) return;
 
-            var board = gameManager.PlayerBoard;
+            GameBoard board;
+            if (currentGameMode == GameMode.Solo)
+                board = gameManager.PlayerBoard;
+            else
+                board = gameManagerServer.PlayerBoard;
             var required = GameBoard.RequiredShips;
 
             btnShip4.Enabled = board.GetShipCount(4) < required[4];
@@ -356,13 +406,16 @@ namespace SeaBattle
 
         private void buttonBackToMenu_Click(object sender, EventArgs e)
         {
+            if (hostingClient != null)
+                hostingClient.Disconnect();
             ShowMainMenu();
             gameManager = null;
+            gameManagerServer = null;
         }
 
         private void buttonStartSolo_Click(object sender, EventArgs e)
         {
-            if (gameManager.State == GameState.Placement)
+            if (curState == GameState.Placement && currentGameMode == GameMode.Solo)
             {
                 if (gameManager.TryFinishPlacement())
                 {
@@ -377,21 +430,40 @@ namespace SeaBattle
             }
         }
 
+        private void buttonStartMultiplayer_Click(object sender, EventArgs e)
+        {
+            if (curState == GameState.Placement && currentGameMode == GameMode.Multiplayer)
+            {
+                if (gameManagerServer.TryFinishPlacement())
+                {
+                    RenderPlayerBoard();
+                    RenderEnemyBoard();
+                    UpdateStatus();
+                }
+                else
+                {
+                    MessageBox.Show("Расставьте все корабли!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+        }
+        
+
         private void ShowGameOverMessage()
         {
-            if (gameManager.EnemyBoard.AllShipsSunk())
+            bool win = (currentGameMode == GameMode.Solo ? gameManager.EnemyBoard.AllShipsSunk() : gameManagerServer.EnemyBoard.AllShipsSunk());
+            if (win)
             {
                 MessageBox.Show("Победа! Все корабли противника уничтожены!", "Морской бой",
                                 MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            else if (gameManager.PlayerBoard.AllShipsSunk())
+            else
             {
                 MessageBox.Show("Поражение! Ваши корабли уничтожены.", "Морской бой",
                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
-        private void btnBackToMtnu_Click(object sender, EventArgs e)
+        private void btnBackToMenu_Click(object sender, EventArgs e)
         {
             ShowMainMenu();
             if (hostingClient  != null)
@@ -433,9 +505,15 @@ namespace SeaBattle
                 int freePort = ((IPEndPoint)listener.LocalEndpoint).Port;
                 listener.Stop();
 
+                Console.WriteLine("Создаём лобби на ", localIpAddress.ToString(), freePort);
+
                 _ = hostingClient.CreateNewLobby(lobbyName, localIpAddress.ToString(), freePort, isPrivate, password);
-                MessageBox.Show($"Создано лобби:\nИмя: {lobbyName}\nТип: {(isPrivate ? "Закрытое" : "Открытое")}",
-                                "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                InitializeOnlineGame();
+
+                Console.WriteLine("Переходим к игре, ожидаем подключения");
+                lobbyServer = new HostPlayer(this, gameManagerServer, freePort, localIpAddress.ToString());
+                //MessageBox.Show($"Создано лобби:\nИмя: {lobbyName}\nТип: {(isPrivate ? "Закрытое" : "Открытое")}",
+                //                "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -512,7 +590,7 @@ namespace SeaBattle
                 if (joinForm.ShowDialog() == DialogResult.OK)
                 {
                     string password = joinForm.EnteredPassword;
-
+                    _ = ClientPlayer.Main(this, lobby.Host, lobby.Port, password);
                     MessageBox.Show($"Подключаемся к закрытому лобби:\n{lobby.Name}",
                                     "Подключение", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -520,10 +598,18 @@ namespace SeaBattle
             else
             {
                 // открытое лобби — подключаемся сразу
+                _ = ClientPlayer.Main(this, lobby.Host, lobby.Port);
                 MessageBox.Show($"Подключаемся к открытому лобби:\n{lobby.Name}",
                                 "Подключение", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
+
+        public void CouldNotConnect()
+        {
+            MessageBox.Show($"Неверно введён пароль, или лобби уже не активно.",
+                                            "Подключение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
         public void UpdateLobbyList(List<LobbyServer> lobbies)
         {
             // очищаем список

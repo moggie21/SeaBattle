@@ -97,18 +97,19 @@ namespace SeaBattle
             enemyClient.Close();
         }
 
-        public static async Task Main(Form1 form, string serverIp, int serverPort)
+        public static async Task Main(Form1 form, string serverIp, int serverPort, string password = "")
         {
-            ClientPlayer client = new ClientPlayer(form, serverIp, serverPort);
+            ClientPlayer client = new ClientPlayer(form, AESEncryptor.Decrypt(serverIp, password), serverPort);
             if (client.isConnected)
             {
+                //form.
                 await client.ListenForMessagesAsync();
             }
             else
             {
                 //ошибка при подключении либо неверно декодирован ip либо что-то ещё 
+                form.CouldNotConnect();
             }
-
             Console.WriteLine("Клиент завершил свою работу");
         }
     }

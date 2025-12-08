@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,8 @@ namespace SeaBattle
         private TcpClient enemyClient;
         private PlayerInfo enemyInfo;
         private PlayerInfo player;
+        private Form1 form;
+        private GameManagerServer gms;
         bool inGame = true;
 
         public void StartListening(int port, string localAddr)
@@ -30,9 +33,10 @@ namespace SeaBattle
         {
             //Обработка ожидание противника
 
+            Console.WriteLine("Начинаю ожидание подключений");
             enemyClient = await listener.AcceptTcpClientAsync();
             Console.WriteLine("Новый клиент подключился!");
-
+            gms.PlayerConnected();
             // передаём игформацию об игроке
             byte[] buffer = null;
             buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(player));
@@ -120,10 +124,12 @@ namespace SeaBattle
             listener?.Stop();
         }
 
-        public HostPlayer(int port = 9000, string localAddr = "26.115.23.91")
+        public HostPlayer(Form1 form, GameManagerServer gms, int port = 9000, string localAddr = "26.115.23.91")
         {
+            this.form = form;
             Console.WriteLine("Запущен сервер на ", localAddr, port);
             this.StartListening(port, localAddr);
+            this.gms = gms;
         }
 
     }
