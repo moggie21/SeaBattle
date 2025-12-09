@@ -21,6 +21,16 @@ namespace SeaBattle
             {1, 0}  // 1-палубных
         };
 
+        public void ReplaceBoard((CellState[,] grid, List<Ship> ships) a)
+        {
+            Grid = a.grid;
+            Ships = new List<Ship>();
+            for (int i = 0; i < a.ships.Count; i++)
+            {
+                Ships.Add(a.ships[i]);
+            }
+        }
+
         public int GetShipCount(int length)
         {
             return shipCounts.TryGetValue(length, out int count) ? count : 0;
@@ -41,7 +51,7 @@ namespace SeaBattle
             if (isVertical && startRow + length > 10) return false;
             if (!isVertical && startCol + length > 10) return false;
 
-            var ship = new Ship(length, startRow, startCol, isVertical);
+            var ship = new Ship(length, (startRow, startCol), isVertical);
             var cells = ship.GetCells();
             var surrounding = ship.GetSurrounding();
 
@@ -71,7 +81,7 @@ namespace SeaBattle
                 return false;
             }
 
-            var ship = new Ship(length, startRow, startCol, isVertical);
+            var ship = new Ship(length, (startRow, startCol), isVertical);
             var cells = ship.GetCells();
 
             foreach (var (r, c) in cells)

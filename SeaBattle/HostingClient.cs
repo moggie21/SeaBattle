@@ -41,12 +41,12 @@ namespace SeaBattle
                 }
                 catch (IOException ioEx)
                 {
-                    Console.WriteLine(ioEx.Message);
+                    Console.WriteLine("Hosting Client Error type1 ", ioEx.Message);
                     break;
                 }
                 catch (SocketException sockEx)
                 {
-                    Console.WriteLine(sockEx.Message);
+                    Console.WriteLine("Hosting Client Error type2 ", sockEx.Message);
                     break;
                 }
             }
@@ -67,11 +67,10 @@ namespace SeaBattle
         {
             try
             {
-                List<LobbyServer> users = JsonConvert.DeserializeObject<List<LobbyServer>>(JSON);
                 //обновление списка лобби в форме
-                form.UpdateLobbyList(users);
+                form.UpdateLobbyList(JsonConvert.DeserializeObject<List<LobbyServer>>(JSON));
             }
-            catch (Exception ex) { Console.WriteLine("Recieved messege is not UserList"); }
+            catch { Console.WriteLine("Recieved messege is not UserList"); }
         }
 
         public async Task CreateNewLobby(string name, string ip, int port, bool isPrivate, string password)

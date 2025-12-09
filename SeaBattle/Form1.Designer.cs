@@ -38,6 +38,7 @@
             btnShip2 = new Button();
             btnShip1 = new Button();
             btnShip4 = new Button();
+            btnAutoPlace = new Button();
             label4 = new Label();
             label3 = new Label();
             playerPanel = new TableLayoutPanel();
@@ -119,6 +120,7 @@
             panel1.Controls.Add(btnShip2);
             panel1.Controls.Add(btnShip1);
             panel1.Controls.Add(btnShip4);
+            panel1.Controls.Add(btnAutoPlace);
             panel1.Controls.Add(label4);
             panel1.Location = new Point(387, 86);
             panel1.Name = "panel1";
@@ -128,7 +130,7 @@
             // radioHorizontal
             // 
             radioHorizontal.AutoSize = true;
-            radioHorizontal.Location = new Point(19, 291);
+            radioHorizontal.Location = new Point(19, 296);
             radioHorizontal.Name = "radioHorizontal";
             radioHorizontal.Size = new Size(137, 24);
             radioHorizontal.TabIndex = 9;
@@ -140,7 +142,7 @@
             // 
             radioVertical.AutoSize = true;
             radioVertical.Checked = true;
-            radioVertical.Location = new Point(19, 261);
+            radioVertical.Location = new Point(19, 266);
             radioVertical.Name = "radioVertical";
             radioVertical.Size = new Size(120, 24);
             radioVertical.TabIndex = 8;
@@ -152,7 +154,7 @@
             // 
             label5.AutoSize = true;
             label5.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label5.Location = new Point(19, 229);
+            label5.Location = new Point(19, 244);
             label5.Name = "label5";
             label5.Size = new Size(174, 20);
             label5.TabIndex = 7;
@@ -197,6 +199,16 @@
             btnShip4.Text = "4-палубный";
             btnShip4.UseVisualStyleBackColor = true;
             btnShip4.Click += btnShip4_Click;
+            // 
+            // btnAutoPlace
+            // 
+            btnAutoPlace.Location = new Point(28, 207);
+            btnAutoPlace.Name = "btnAutoPlace";
+            btnAutoPlace.Size = new Size(145, 34);
+            btnAutoPlace.TabIndex = 1;
+            btnAutoPlace.Text = "Автоматически";
+            btnAutoPlace.UseVisualStyleBackColor = true;
+            btnAutoPlace.Click += btnAutoPlace_Click;
             // 
             // label4
             // 
@@ -367,7 +379,6 @@
             buttonStartSolo.Text = "В бой";
             buttonStartSolo.UseVisualStyleBackColor = false;
             buttonStartSolo.Click += buttonStartSolo_Click;
-            buttonStartSolo.Click += buttonStartMultiplayer_Click;
             // 
             // buttonBackToMenu
             // 
@@ -546,6 +557,7 @@
         private Button btnShip2;
         private Button btnShip1;
         private Button btnShip4;
+        private Button btnAutoPlace;
         private Label label4;
         private Label label3;
         private TableLayoutPanel playerPanel;

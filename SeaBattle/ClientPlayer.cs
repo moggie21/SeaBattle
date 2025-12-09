@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SeaBattle
 {
-    internal class ClientPlayer
+    public class ClientPlayer
     {
         private PlayerInfo enemyInfo;
         private PlayerInfo player;
@@ -27,26 +27,38 @@ namespace SeaBattle
 
         public async Task ListenForMessagesAsync()
         {
-            byte[] buffer = null;
-            // ожидаем информацию о противнике
-            buffer = new byte[enemyClient.ReceiveBufferSize];
-            int bytesRead = await enemyClient.GetStream().ReadAsync(buffer, 0, buffer.Length);
-            if (bytesRead > 0)
+            try
             {
-                string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                enemyInfo = JsonConvert.DeserializeObject<PlayerInfo>(message);
-            }
-            // передаём игформацию об игроке
-            buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(player));
-            _ = enemyClient.GetStream().WriteAsync(buffer, 0, buffer.Length);
+                byte[] buffer = null;
+                // ожидаем информацию о противнике
+                buffer = new byte[enemyClient.ReceiveBufferSize];
+                int bytesRead = await enemyClient.GetStream().ReadAsync(buffer, 0, buffer.Length);
+                if (bytesRead > 0)
+                {
+                    string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                    enemyInfo = JsonConvert.DeserializeObject<PlayerInfo>(message);
+                }
+                // передаём информацию об игроке
+                buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(player));
+                _ = enemyClient.GetStream().WriteAsync(buffer, 0, buffer.Length);
 
-            NetworkStream stream = enemyClient.GetStream();
-            buffer = new byte[enemyClient.ReceiveBufferSize];
-            bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);//enemyboard
-            while (!gameManager.TryFinishPlacement()) { }
-            while (isConnected && enemyClient.Connected)
-            {
-                try
+                gameManager.PlayerConnected();
+
+                NetworkStream stream = enemyClient.GetStream();
+                buffer = new byte[enemyClient.ReceiveBufferSize];
+
+                bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);//enemyboard
+                string dataRecieves = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                gameManager.EnemyBoard.ReplaceBoard(JsonConvert.DeserializeObject<(CellState[,], List<Ship>)>(dataRecieves));
+                if (!gameManager.TryFinishPlacement())
+                {
+                    bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);//enemyboard
+                    gameManager.TryFinishPlacement();
+                }
+                else
+                    stream.WriteAsync(buffer, 0, buffer.Length);
+                
+                while (isConnected && enemyClient.Connected)
                 {
 
                     // обработка логики игры
@@ -61,25 +73,41 @@ namespace SeaBattle
                     if (bytesRead > 0)
                     {
                         (int, int) shot = JsonConvert.DeserializeObject<(int, int)>(dataReceived);
-                        gameManager.ShootingController(shot.Item1, shot.Item2, gameManager.PlayerBoard);
+                        //MessageBox.Show($"Got shot at {shot.Item1}, {shot.Item2}",
+                        //    "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        gameManager.ShootingController(shot.Item1, shot.Item2);
                     }
                 }
-                catch (IOException ioEx)
-                {
-                    Console.WriteLine(ioEx.Message);
-                    break;
-                }
-                catch (SocketException sockEx)
-                {
-                    Console.WriteLine(sockEx.Message);
-                    break;
-                }
+            }
+            catch (IOException ioEx)
+            {
+                Console.WriteLine(ioEx.Message);
+                MessageBox.Show($"Противник покинул игру", "info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                form.ShowMainMenu();
+                isConnected = false;
+                form.hostingClient.Disconnect();
+            }
+            catch (SocketException sockEx)
+            {
+                Console.WriteLine(sockEx.Message);
+                MessageBox.Show($"Противник покинул игру", "info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                form.ShowMainMenu();
+                isConnected = false;
+                form.hostingClient.Disconnect();
             }
         }
 
         public void SendBoard()
         {
-            byte[] buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(gameManager.PlayerBoard));
+            CellState[,] newcell = gameManager.PlayerBoard.Grid;
+            List<Ship> ships = new List<Ship>();
+            for (int i = 0; i < gameManager.PlayerBoard.Ships.Count; i++)
+            {
+                ships.Add(gameManager.PlayerBoard.Ships[i]);
+            }
+            byte[] buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject((newcell, ships)));
+            //MessageBox.Show($"{board.Grid.Length}\n{board.Ships.Count}", "info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
             _ = enemyClient.GetStream().WriteAsync(buffer, 0, buffer.Length);
         }
 
@@ -97,18 +125,20 @@ namespace SeaBattle
             enemyClient.Close();
         }
 
-        public static async Task Main(Form1 form, string serverIp, int serverPort, string password = "")
+        public static async Task Main(Form1 form, string username, string serverIp, int serverPort, string password)
         {
             ClientPlayer client = new ClientPlayer(form, AESEncryptor.Decrypt(serverIp, password), serverPort);
             if (client.isConnected)
             {
-                //form.
+                client.gameManager = form.InitializeOnlineGame();
+                client.player = new PlayerInfo(username);
+                form.clientPlayer = client;
                 await client.ListenForMessagesAsync();
             }
             else
             {
-                //ошибка при подключении либо неверно декодирован ip либо что-то ещё 
                 form.CouldNotConnect();
+                client.Disconnect();
             }
             Console.WriteLine("Клиент завершил свою работу");
         }

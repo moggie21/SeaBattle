@@ -36,6 +36,7 @@ public class AESEncryptor
                     csEncrypt.Write(plainTextBytes, 0, plainTextBytes.Length);
                     csEncrypt.FlushFinalBlock();
                 }
+                //MessageBox.Show($"Encrypted with {password}\n{Convert.ToBase64String(msEncrypt.ToArray())}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                 return Convert.ToBase64String(msEncrypt.ToArray());
             }
@@ -45,8 +46,9 @@ public class AESEncryptor
     // Метод дешифрования
     public static string Decrypt(string cipherText, string password)
     {
-        if (password == null || password.Length == 0) password = "StandartPassword123";
+        if (password == null || password.Length == 0 || password == "") password = "StandartPassword123";
         byte[] cipherTextBytes = Convert.FromBase64String(cipherText);
+        //MessageBox.Show($"Decrypted with {password}\n", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
         // Извлекаем salt и IV
         byte[] salt = new byte[16];

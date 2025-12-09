@@ -51,7 +51,7 @@ namespace SeaBattle
         }
 
         // автоматическая расстановка кораблей
-        private void AutoPlaceShips(GameBoard board)
+        public void AutoPlaceShips(GameBoard board)
         {
             var required = GameBoard.RequiredShips;
             var random = new Random();

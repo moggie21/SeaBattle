@@ -8,20 +8,30 @@ namespace SeaBattle
 {
     public class Ship
     {
-        public int Length { get; }
-        public bool IsVertical { get; }
-        public (int Row, int Col) Start { get; } // левая верхняя клетка
+        public int Length { get; private set; }
+        public bool IsVertical { get; private set; }
+        public (int Row, int Col) Start { get; private set; } // левая верхняя клетка
         public bool[] HitParts { get; private set; } // по одной bool на палубу
 
-        public Ship(int length, int startRow, int startCol, bool isVertical)
+        public Ship(int length, (int Row, int Col) start, bool isVertical)
         {
             if (length < 1 || length > 4)
                 throw new ArgumentException("Длина корабля должна быть от 1 до 4.");
             Length = length;
-            Start = (startRow, startCol);
+            Start = (start.Row, start.Col);
             IsVertical = isVertical;
             HitParts = new bool[length];
         }
+        //public Ship(int length, int startRow, int startCol, bool isVertical)
+        //{
+        //    if (length < 1 || length > 4)
+        //        throw new ArgumentException("Длина корабля должна быть от 1 до 4.");
+        //    Length = length;
+        //    Start = (startRow, startCol);
+        //    IsVertical = isVertical;
+        //    HitParts = new bool[length];
+        //}
+        
 
         // Получить все координаты корабля
         public List<(int Row, int Col)> GetCells()

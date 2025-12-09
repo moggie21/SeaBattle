@@ -11,6 +11,6 @@ namespace SeaBattle
         public string username { get; private set; }
 
         // возможно расширение информации до аватарки статусов и т.д.ы
-
+        public PlayerInfo(string username) {  this.username = username; }
     }
 }

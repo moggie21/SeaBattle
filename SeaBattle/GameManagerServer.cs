@@ -13,12 +13,14 @@ namespace SeaBattle
         public GameBoard EnemyBoard { get; private set; }
         public GameState State { get; private set; }
         private Form1 form;
+        private bool isFirst = true;
 
         public GameManagerServer(Form1 form)
         {
             PlayerBoard = new GameBoard();
             EnemyBoard = new GameBoard();
             State = GameState.ServerWait;
+            form.UpdateCurState(State);
             this.form = form;
         }
 
@@ -29,25 +31,29 @@ namespace SeaBattle
         }
         public void SetEnemyBoard(GameBoard neb)
         {
-            EnemyBoard = neb;
+            //EnemyBoard.ReplaceBoard(neb);
         }
 
         // проверка на то, все ли игроки закончили с растоновкой
         public bool TryFinishPlacement()
         {
-            if (!PlayerBoard.HasAllShipsPlaced())
+            if (!PlayerBoard.HasAllShipsPlaced()){
+                isFirst = false;
                 return false;
+            }
             PlayerBoard.FinishPlacement();
-            if (!EnemyBoard.HasAllShipsPlaced())
+            if (!EnemyBoard.HasAllShipsPlaced()){
+                isFirst = true;
                 return false;
+            }
             EnemyBoard.FinishPlacement();
-            State = GameState.MyTurn;
+            State = isFirst?GameState.MyTurn:GameState.EnemyTurn;
             form.UpdateCurState(State);
             return true;
         }
 
         // автоматическая расстановка кораблей
-        private void AutoPlaceShips(GameBoard board)
+        public void AutoPlaceShips(GameBoard board)
         {
             var required = GameBoard.RequiredShips;
             var random = new Random();
@@ -73,14 +79,10 @@ namespace SeaBattle
             }
         }
 
-        public (bool hit, CellState result) ShootingController(int row, int col, GameBoard board)
+        public (bool hit, CellState result) ShootingController(int row, int col)
         {
-            if (State != GameState.MyTurn || board.PlacementComplete == false)
-                return (false, CellState.Empty);
-
+            GameBoard board = State == GameState.MyTurn? EnemyBoard: PlayerBoard;
             bool hit = board.Shoot(row, col, out var result);
-
-            
             if (!board.AllShipsSunk())
             {
                 if (!hit){
@@ -88,7 +90,7 @@ namespace SeaBattle
                     {
                         State = GameState.MyTurn;
                     }
-                        State = GameState.EnemyTurn;
+                 else State = GameState.EnemyTurn;
                 }
             }
             else
@@ -97,15 +99,10 @@ namespace SeaBattle
             }
 
             form.UpdateCurState(State);
+            form.RenderEnemyBoard();
+            form.RenderPlayerBoard();
             return (hit, result);
         }
 
-        private bool IsValidTarget(int r, int c)
-        {
-            if (r < 0 || r >= 10 || c < 0 || c >= 10)
-                return false;
-            var state = PlayerBoard.Grid[r, c];
-            return state != CellState.Miss && state != CellState.Hit && state != CellState.Sunk;
-        }
     }
 }

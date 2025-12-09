@@ -31,23 +31,12 @@ namespace LobbyHostingServer
             while (true)
             {
                 TcpClient client = await listener.AcceptTcpClientAsync();
-                //bool isOld = false;
-                //foreach (var us in curActiveClients)
-                //{
-                //    if (us.tcpclient == client)
-                //    {
-                //        isOld = true;
-                //        break;
-                //    }
-                //}
-                //if (!isOld)
                 {
-                    Console.WriteLine("Новый клиент подключился!");
                     curActiveClients.Add(client);
+                    Console.WriteLine($"Новый клиент подключился! {curActiveClients.Count()}");
                     byte[] buffer = null;
-                    buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(curActiveLobbies));
-                    _ = client.GetStream().WriteAsync(buffer, 0, buffer.Length);
                     _ = HandleClient(client);
+                    LobbyListUpdate();
                 }
             }
         }
